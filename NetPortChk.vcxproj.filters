@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Origen">
+      <UniqueIdentifier>{11111111-1111-1111-1111-111111111111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Origen\MFC">
+      <UniqueIdentifier>{22222222-2222-2222-2222-222222222222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Origen\MFC\Diálogos">
+      <UniqueIdentifier>{33333333-3333-3333-3333-333333333333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Origen\Lógica">
+      <UniqueIdentifier>{44444444-4444-4444-4444-444444444444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cabeceras">
+      <UniqueIdentifier>{55555555-5555-5555-5555-555555555555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cabeceras\MFC">
+      <UniqueIdentifier>{66666666-6666-6666-6666-666666666666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cabeceras\Lógica">
+      <UniqueIdentifier>{77777777-7777-7777-7777-777777777777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Recursos">
+      <UniqueIdentifier>{88888888-8888-8888-8888-888888888888}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- PCH -->
+    <ClCompile Include="src\pch.cpp">
+      <Filter>Origen</Filter>
+    </ClCompile>
+    <!-- MFC -->
+    <ClCompile Include="src\NetPortChk.cpp">
+      <Filter>Origen\MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainFrame.cpp">
+      <Filter>Origen\MFC</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultListCtrl.cpp">
+      <Filter>Origen\MFC</Filter>
+    </ClCompile>
+    <!-- Diálogos -->
+    <ClCompile Include="src\ConfigEditorDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+<ClCompile Include="src\AboutDlg.cpp">
+      <Filter>Origen\MFC\Diálogos</Filter>
+    </ClCompile>
+    <!-- Lógica -->
+    <ClCompile Include="src\XmlLite.cpp">
+      <Filter>Origen\Lógica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConfigManager.cpp">
+      <Filter>Origen\Lógica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NetworkChecker.cpp">
+      <Filter>Origen\Lógica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HtmlExporter.cpp">
+      <Filter>Origen\Lógica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PortDB.cpp">
+      <Filter>Origen\Lógica</Filter>
+    </ClCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- PCH header -->
+    <ClInclude Include="src\pch.h">
+      <Filter>Cabeceras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource.h">
+      <Filter>Cabeceras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AppTypes.h">
+      <Filter>Cabeceras</Filter>
+    </ClInclude>
+    <!-- MFC headers -->
+    <ClInclude Include="src\NetPortChk.h">
+      <Filter>Cabeceras\MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MainFrame.h">
+      <Filter>Cabeceras\MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResultListCtrl.h">
+      <Filter>Cabeceras\MFC</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConfigEditorDlg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+<ClInclude Include="src\AboutDlg.h">
+      <Filter>Cabeceras\MFC</Filter>
+    </ClInclude>
+    <!-- Logic headers -->
+    <ClInclude Include="src\XmlLite.h">
+      <Filter>Cabeceras\Lógica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConfigManager.h">
+      <Filter>Cabeceras\Lógica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NetworkChecker.h">
+      <Filter>Cabeceras\Lógica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HtmlExporter.h">
+      <Filter>Cabeceras\Lógica</Filter>
+    </ClInclude>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ResourceCompile Include="src\NetPortChk.rc">
+      <Filter>Recursos</Filter>
+    </ResourceCompile>
+    <None Include="src\NetPortChk.manifest">
+      <Filter>Recursos</Filter>
+    </None>
+  </ItemGroup>
+</Project>

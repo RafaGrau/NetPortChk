@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Ayuda de NetPortChk - Introducción</title>
+<style>
+body{font-family:"Segoe UI",sans-serif;font-size:13px;color:#1e2a38;background:#f4f7fb;margin:0;padding:0;}
+.page{max-width:860px;margin:0 auto;padding:18px 26px 36px;}
+h1{font-size:16px;font-weight:600;color:#1a3a5c;border-bottom:2px solid #d0dce8;padding-bottom:6px;margin-bottom:14px;}
+h2{font-size:14px;font-weight:600;color:#2a5080;margin:18px 0 6px;}
+h3{font-size:13px;font-weight:600;color:#2a5080;margin:12px 0 4px;}
+p{margin:0 0 8px;line-height:1.5;}
+ul,ol{padding-left:18px;margin:0 0 10px;}
+li{margin-bottom:4px;line-height:1.5;}
+.tip{background:#e8f4fd;border-left:4px solid #4a9fd4;padding:7px 12px;border-radius:0 4px 4px 0;margin:10px 0;font-size:13px;}
+.tip b{color:#1a3a5c;}
+table{border-collapse:collapse;width:100%;margin-bottom:12px;font-size:13px;}
+th{background:#1a3a5c;color:#fff;padding:5px 8px;text-align:left;font-weight:400;}
+td{padding:4px 8px;border-bottom:1px solid #dde3ea;vertical-align:middle;}
+tr:nth-child(even)td{background:#eef2f8;}
+.ic{display:inline-flex;align-items:center;white-space:nowrap;}
+.st{display:inline-block;padding:1px 6px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.ok{background:#d4f0db;color:#1a7a3a;}
+.fail{background:#fde0dd;color:#c0200e;}
+.noresp{background:#dde4f8;color:#3a4aaa;}
+.dis{background:#e8edf2;color:#778899;}
+pre{background:#1e2a38;color:#b8d4ec;border-radius:5px;padding:10px 14px;font-family:Consolas,monospace;font-size:11px;overflow-x:auto;margin:8px 0;}
+kbd{background:#eee;border:1px solid #bbb;border-radius:3px;padding:1px 4px;font-size:12px;font-family:Consolas,monospace;}
+code{font-family:Consolas,monospace;font-size:12px;background:#e8edf4;padding:1px 3px;border-radius:3px;}
+</style></head>
+<body><div class="page">
+
+<h1>Introducci&#243;n</h1>
+<p><b>NetPortChk</b> es una herramienta de diagn&#243;stico de red para administradores Windows.
+Verifica la conectividad TCP/UDP hacia puertos espec&#237;ficos de servidores de infraestructura empresarial.</p>
+<h2>Tipos de servidor soportados</h2>
+<table>
+<tr><th>Tipo</th><th>Puertos predeterminados</th></tr>
+<tr><td><b>Domain Controller</b></td><td>DNS 53, Kerberos 88, RPC 135, NetBIOS 139, LDAP 389, SMB 445, LDAPS 636, GC 3268/3269&#8230;</td></tr>
+<tr><td><b>Print Server</b></td><td>HTTP 80, HTTPS 443, SMB 445, LPD 515, IPP 631, RAW 9100</td></tr>
+<tr><td><b>SCCM (Full)</b></td><td>HTTP/HTTPS 80/443, SMB 445, RPC 135, WSUS 8530/8531</td></tr>
+<tr><td><b>SCCM DP</b></td><td>HTTP/HTTPS 80/443, SMB 445, WSUS 8530/8531</td></tr>
+<tr><td><b>Servidor DNS</b></td><td>DNS TCP/UDP 53, DNS-over-TLS 853, RNDC 953</td></tr>
+<tr><td><b>Servidor DHCP</b></td><td>DHCP Server UDP 67, DHCP Client UDP 68, DHCPv6 546/547</td></tr>
+<tr><td><b>Personalizado</b></td><td>Sin puertos predeterminados.</td></tr>
+</table>
+<div class="tip"><b>Requisito:</b> Windows x64. No requiere instalaci&#243;n.</div>
+
+</div></body></html>

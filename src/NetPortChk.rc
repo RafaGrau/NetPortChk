@@ -1,0 +1,243 @@
+// Microsoft Visual C++ generated resource script.
+//
+#pragma code_page(1252)
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+#include "version.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Espa�ol (Espa�a) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
+#pragma code_page(1252)
+
+// Application icon (multi-size: 48, 32, 24, 16)
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP " "
+    BEGIN
+        MENUITEM " ", 0xFFFF, GRAYED
+    END
+END
+
+IDR_MAINFRAME   ICON    "..\\res\\appMain.ico"
+
+// Toolbar icons as ICON resources (32x32 loaded at runtime via LoadImage)
+IDI_ICON_RUN     ICON   "..\\res\\play.ico"
+IDI_ICON_STOP    ICON   "..\\res\\stop.ico"
+IDI_ICON_HTML    ICON   "..\\res\\html.ico"
+IDI_ICON_SAVE    ICON   "..\\res\\cfg_save.ico"
+IDI_ICON_RELOAD  ICON   "..\\res\\cfg_reload.ico"
+IDI_ICON_CFGEDIT ICON   "..\\res\\cfg_edit.ico"
+IDI_ICON_INFO    ICON   "..\\res\\info.ico"
+IDI_ICON_EXIT    ICON   "..\\res\\exit.ico"
+IDI_ICON_HELP    ICON   "..\\res\\help.ico"
+IDI_ICON_SRV_ADD  ICON   "..\\res\\srv_add.ico"
+IDI_ICON_SAVE2    ICON   "..\\res\\save.ico"
+IDI_ICON_GITHUB   ICON   "..\\res\\github.ico"
+IDI_ICON_VIEWTABS ICON  "..\\res\\view_tabs.ico"
+IDI_ICON_VIEWLIST ICON  "..\\res\\view_list.ico"
+IDI_ICON_CSV_IN   ICON   "..\\res\\csv_in.ico"
+IDI_ICON_CSV_OUT  ICON   "..\\res\\csv_out.ico"
+IDI_ICON_PORT_DEL  ICON  "..\\res\\port_del.ico"
+IDI_ICON_PORT_EDIT ICON  "..\\res\\port_edit.ico"
+IDI_ICON_PORT_ADD  ICON  "..\\res\\port_add.ico"
+IDI_ICON_SRV_DEL   ICON  "..\\res\\srv_del.ico"
+
+// cp1252: 0xE1=a 0xE9=e 0xED=i 0xF3=o 0xFA=u 0xF1=n~ 0xBF=?inv
+
+// ----------------------------------------------------------------------------
+// Version
+// ----------------------------------------------------------------------------
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    VER_FILEVERSION
+ PRODUCTVERSION VER_PRODUCTVERSION
+ FILEFLAGSMASK  0x3fL
+#ifdef _DEBUG
+ FILEFLAGS      VS_FF_DEBUG
+#else
+ FILEFLAGS      0x0L
+#endif
+ FILEOS         VOS_NT_WINDOWS32
+ FILETYPE       VFT_APP
+ FILESUBTYPE    VFT_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "0c0a04b0"
+        BEGIN
+            VALUE "CompanyName",      "NetPortChk"
+            VALUE "FileDescription",  "NetPortChk - Comprobador de conectividad TCP/UDP"
+            VALUE "FileVersion",      VER_FILEVERSION_STR
+            VALUE "InternalName",     "NetPortChk"
+            VALUE "LegalCopyright",   "2025"
+            VALUE "OriginalFilename", "NetPortChk.exe"
+            VALUE "ProductName",      "NetPortChk"
+            VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0c0a, 1200
+    END
+END
+
+// ----------------------------------------------------------------------------
+// Menu principal  (Unicode symbols patched at runtime via ModifyMenu)
+// ----------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+// Context menu for ListView right-click
+// ----------------------------------------------------------------------------
+IDR_CONTEXT_LIST MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "&Habilitar todos",      ID_CTX_ENABLE_ALL
+        MENUITEM "&Deshabilitar todos",   ID_CTX_DISABLE_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "Habilitar solo &TCP",   ID_CTX_ENABLE_TCP
+        MENUITEM "Deshabilitar solo TC&P",ID_CTX_DISABLE_TCP
+        MENUITEM "Habilitar solo &UDP",   ID_CTX_ENABLE_UDP
+        MENUITEM "Deshabilitar solo UD&P",ID_CTX_DISABLE_UDP
+    END
+END
+
+// ----------------------------------------------------------------------------
+// String table
+// ----------------------------------------------------------------------------
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME       "NetPortChk"
+    IDS_APP_TITLE       "NetPortChk - Comprobador de conectividad"
+    IDS_READY           "Listo"
+    IDS_CHECKING        "Comprobando..."
+    IDS_DONE            "Completado"
+    IDS_UNSAVED_CHANGES "Hay cambios sin guardar"
+END
+
+// ----------------------------------------------------------------------------
+// IDD_ABOUT
+// ----------------------------------------------------------------------------
+IDD_ABOUT DIALOGEX 0, 0, 270, 146
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Acerca de NetPortChk"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    // Fila 1: icono app + nombre + subtitulo
+    ICON            IDR_MAINFRAME, IDC_STATIC, 8, 8, 32, 32
+    LTEXT           "NetPortChk  (x64)", IDC_STATIC, 48, 10, 210, 12
+    LTEXT           "Comprobador de conectividad TCP/UDP", IDC_STATIC, 48, 24, 210, 10
+    LTEXT           "", IDC_ABOUT_VERSION, 48, 36, 210, 10
+
+    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 50, 258, 1
+
+    // Fila 2: icono GitHub + enlace URL
+    ICON            IDI_ICON_GITHUB, IDC_STATIC, 8, 56, 16, 16
+    CONTROL         "", IDC_ABOUT_LINK_GITHUB, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 30, 58, 232, 12
+
+    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 76, 258, 1
+
+    // Licencia
+    LTEXT           "General Public License v3.0", IDC_STATIC, 8, 82, 254, 10
+
+    // Iconos
+    LTEXT           "Iconos:", IDC_STATIC, 8, 96, 28, 10
+    CONTROL         "", IDC_ABOUT_LINK_ICONS8, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 38, 96, 224, 12
+
+    DEFPUSHBUTTON   "Aceptar", IDOK, 202, 126, 60, 14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// IDD_CONFIG_EDITOR
+// Layout: toolbar strip (created dynamically at y=0..~22) |
+//         server form row (y=26..40) | separator (y=42) |
+//         tab+list (y=44..289) | bottom row (y=302)
+
+IDD_CONFIG_EDITOR DIALOGEX 0, 0, 410, 312
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Configuraci�n de servidores"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    // -- Server form row (left-aligned). RepositionFormRow() snaps flush below toolbar.
+    LTEXT           "Nombre:",IDC_CFG_LBL_NAME,7,26,36,8
+    EDITTEXT        IDC_CFG_EDIT_NAME,45,24,100,12,ES_AUTOHSCROLL|WS_TABSTOP
+    LTEXT           "IP:",IDC_CFG_LBL_IP,153,26,14,8
+    CONTROL         "",IDC_CFG_EDIT_IP,"SysIPAddress32",WS_CHILD|WS_VISIBLE|WS_BORDER|WS_TABSTOP,169,24,88,12
+    LTEXT           "Tipo:",IDC_CFG_LBL_TYPE,265,26,24,8
+    COMBOBOX        IDC_CFG_COMBO_TYPE,291,24,110,60,CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+
+    // -- Separator
+    CONTROL         "",IDC_CFG_TOOLBAR_SEP,"Static",SS_ETCHEDHORZ|WS_CHILD|WS_VISIBLE,0,38,410,1
+
+    // -- Tab + list
+    CONTROL         "",IDC_CFG_TAB,"SysTabControl32",TCS_TABS|WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_CLIPSIBLINGS,7,40,396,248
+    CONTROL         "",IDC_CFG_LIST,"SysListView32",LVS_REPORT|LVS_SHOWSELALWAYS|LVS_SINGLESEL|WS_CHILD|WS_VISIBLE|WS_BORDER|WS_TABSTOP,14,61,382,222
+
+    // -- Bottom row: Timeout (left) + OK/Cancel (right)
+    LTEXT           "Timeout:",IDC_STATIC,7,296,30,8
+    COMBOBOX        IDC_CFG_COMBO_TIMEOUT,40,294,80,50,CBS_DROPDOWNLIST|WS_TABSTOP
+    DEFPUSHBUTTON   "Aceptar",IDOK,285,294,60,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,350,294,55,14
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// IDD_PORT_EDITOR -- modal dialog for adding/editing a single port entry
+
+IDD_PORT_EDITOR DIALOGEX 0, 0, 242, 86
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Puerto"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    // -- Row 1: Puerto + Protocolo -----------------------------------------------
+    LTEXT           "Puerto:",IDC_STATIC,7,12,34,8
+    EDITTEXT        IDC_PORT_ED_PORT,43,10,44,12,ES_NUMBER|ES_AUTOHSCROLL|WS_TABSTOP
+    LTEXT           "Protocolo:",IDC_STATIC,93,12,44,8
+    COMBOBOX        IDC_PORT_ED_PROTO,139,10,58,40,CBS_DROPDOWNLIST|WS_TABSTOP
+    // -- Row 2-3: Descripci�n (label + edit full-width) ---------------------------
+    LTEXT           "Descripci�n:",IDC_STATIC,7,28,50,8
+    EDITTEXT        IDC_PORT_ED_DESC,7,40,228,12,ES_AUTOHSCROLL|WS_TABSTOP
+    // -- Row 4: OK / Cancel ------------------------------------------------------
+    DEFPUSHBUTTON   "Aceptar",IDOK,116,64,55,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,177,64,58,14
+END
+
+#endif    // Espa�ol (Espa�a) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// TEXTINCLUDE
+
+#ifdef APSTUDIO_INVOKED
+
+1 TEXTINCLUDE
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+

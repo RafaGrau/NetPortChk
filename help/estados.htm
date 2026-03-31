@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Ayuda de NetPortChk - Estados de puerto</title>
+<style>
+body{font-family:"Segoe UI",sans-serif;font-size:13px;color:#1e2a38;background:#f4f7fb;margin:0;padding:0;}
+.page{max-width:860px;margin:0 auto;padding:18px 26px 36px;}
+h1{font-size:16px;font-weight:600;color:#1a3a5c;border-bottom:2px solid #d0dce8;padding-bottom:6px;margin-bottom:14px;}
+h2{font-size:14px;font-weight:600;color:#2a5080;margin:18px 0 6px;}
+h3{font-size:13px;font-weight:600;color:#2a5080;margin:12px 0 4px;}
+p{margin:0 0 8px;line-height:1.5;}
+ul,ol{padding-left:18px;margin:0 0 10px;}
+li{margin-bottom:4px;line-height:1.5;}
+.tip{background:#e8f4fd;border-left:4px solid #4a9fd4;padding:7px 12px;border-radius:0 4px 4px 0;margin:10px 0;font-size:13px;}
+.tip b{color:#1a3a5c;}
+table{border-collapse:collapse;width:100%;margin-bottom:12px;font-size:13px;}
+th{background:#1a3a5c;color:#fff;padding:5px 8px;text-align:left;font-weight:400;}
+td{padding:4px 8px;border-bottom:1px solid #dde3ea;vertical-align:middle;}
+tr:nth-child(even)td{background:#eef2f8;}
+.ic{display:inline-flex;align-items:center;white-space:nowrap;}
+.st{display:inline-block;padding:1px 6px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.ok{background:#d4f0db;color:#1a7a3a;}
+.fail{background:#fde0dd;color:#c0200e;}
+.noresp{background:#dde4f8;color:#3a4aaa;}
+.dis{background:#e8edf2;color:#778899;}
+pre{background:#1e2a38;color:#b8d4ec;border-radius:5px;padding:10px 14px;font-family:Consolas,monospace;font-size:11px;overflow-x:auto;margin:8px 0;}
+kbd{background:#eee;border:1px solid #bbb;border-radius:3px;padding:1px 4px;font-size:12px;font-family:Consolas,monospace;}
+code{font-family:Consolas,monospace;font-size:12px;background:#e8edf4;padding:1px 3px;border-radius:3px;}
+</style></head>
+<body><div class="page">
+
+<h1>Estados de puerto</h1>
+<table>
+<tr><th width="140">Estado</th><th>Significado</th></tr>
+<tr><td><span class="st ok">OK</span></td>
+    <td>Conexi&#243;n establecida. El puerto est&#225; abierto y accesible.</td></tr>
+<tr><td><span class="st fail">CERRADO</span></td>
+    <td>TCP RST o ICMP port-unreachable (UDP). Servicio no disponible o firewall activo.</td></tr>
+<tr><td><span class="st noresp">SIN RESPUESTA</span></td>
+    <td>Solo UDP. Sin respuesta dentro del timeout. Puerto abierto o filtrado silenciosamente.</td></tr>
+<tr><td><span class="st dis">&#8212;</span></td>
+    <td>Puerto deshabilitado. No se comprueba ni aparece en el informe HTML.</td></tr>
+</table>
+<div class="tip"><b>UDP:</b> <span class="st noresp">SIN RESPUESTA</span> es habitual en puertos correctamente configurados (DHCP, Syslog&#8230;).
+<span class="st ok">OK</span> solo aparece si el servicio responde con datos.</div>
+
+</div></body></html>

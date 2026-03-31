@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+</HEAD><BODY>
+<UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Introducción"><param name="Local" value="intro.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Barra de herramientas"><param name="Local" value="toolbar.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Editor de configuración"><param name="Local" value="config.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Tipos de servidor"><param name="Local" value="config.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Importar CSV"><param name="Local" value="config.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Exportar CSV"><param name="Local" value="config.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Diálogo de puerto"><param name="Local" value="config.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Comprobación de conectividad"><param name="Local" value="test.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Estados de puerto"><param name="Local" value="estados.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Informe HTML"><param name="Local" value="informe.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Archivo de configuración"><param name="Local" value="xmlfmt.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Timeout"><param name="Local" value="config.htm"></OBJECT>
+</UL>
+</BODY></HTML>

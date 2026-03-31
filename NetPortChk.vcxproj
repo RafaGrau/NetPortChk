@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- ── Project Configurations ────────────────────────────────────────────── -->
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <!-- ── Globals ──────────────────────────────────────────────────────────── -->
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
+    <RootNamespace>NetPortChk</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <!-- ── Per-configuration properties ─────────────────────────────────────── -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
+            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
+            Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
+            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
+            Label="LocalAppDataPlatform" />
+  </ImportGroup>
+
+  <!-- ── Compiler & Linker (Debug x64) ─────────────────────────────────────── -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)scripts\increment_build.ps1" -VersionFile "$(ProjectDir)src\version.h"</Command>
+      <Message>Incrementando VER_BUILD...</Message>
+    </PreBuildEvent>
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>_AFXDLL;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;shell32.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)src\NetPortChk.manifest</AdditionalManifestFiles>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>if exist "%ProgramFiles(x86)%\HTML Help Workshop\hhc.exe" (
+  "%ProgramFiles(x86)%\HTML Help Workshop\hhc.exe" "$(ProjectDir)help\NetPortChk.hhp"
+  copy /Y "$(ProjectDir)help\NetPortChk.chm" "$(OutDir)NetPortChk.chm"
+) else (
+  echo [AVISO] HTML Help Workshop no encontrado. El archivo .chm no se ha compilado.
+)</Command>
+      <Message>Compilando ayuda CHM...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+  <!-- ── Compiler & Linker (Release x64) ──────────────────────────────────── -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEvent>
+      <Command>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)scripts\increment_build.ps1" -VersionFile "$(ProjectDir)src\version.h"</Command>
+      <Message>Incrementando VER_BUILD...</Message>
+    </PreBuildEvent>
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>_AFXDLL;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;shell32.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Manifest>
+      <AdditionalManifestFiles>$(ProjectDir)src\NetPortChk.manifest</AdditionalManifestFiles>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>if exist "%ProgramFiles(x86)%\HTML Help Workshop\hhc.exe" (
+  "%ProgramFiles(x86)%\HTML Help Workshop\hhc.exe" "$(ProjectDir)help\NetPortChk.hhp"
+  copy /Y "$(ProjectDir)help\NetPortChk.chm" "$(OutDir)NetPortChk.chm"
+) else (
+  echo [AVISO] HTML Help Workshop no encontrado. El archivo .chm no se ha compilado.
+)</Command>
+      <Message>Compilando ayuda CHM...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+  <!-- ── Source files ──────────────────────────────────────────────────────── -->
+  <ItemGroup>
+    <!-- PCH -->
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+
+    <!-- Application -->
+    <ClCompile Include="src\NetPortChk.cpp" />
+    <ClCompile Include="src\MainFrame.cpp" />
+    <ClCompile Include="src\ResultListCtrl.cpp" />
+
+    <!-- Dialogs -->
+    <ClCompile Include="src\ConfigEditorDlg.cpp" />
+<ClCompile Include="src\AboutDlg.cpp" />
+
+    <!-- Business logic -->
+    <ClCompile Include="src\XmlLite.cpp" />
+    <ClCompile Include="src\ConfigManager.cpp" />
+    <ClCompile Include="src\NetworkChecker.cpp" />
+    <ClCompile Include="src\HtmlExporter.cpp" />
+    <ClCompile Include="src\PortDB.cpp" />
+  </ItemGroup>
+
+  <!-- ── Header files ──────────────────────────────────────────────────────── -->
+  <ItemGroup>
+    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\version.h" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\AppTypes.h" />
+    <ClInclude Include="src\NetPortChk.h" />
+    <ClInclude Include="src\MainFrame.h" />
+    <ClInclude Include="src\ResultListCtrl.h" />
+    <ClInclude Include="src\ConfigEditorDlg.h" />
+<ClInclude Include="src\AboutDlg.h" />
+    <ClInclude Include="src\XmlLite.h" />
+    <ClInclude Include="src\ConfigManager.h" />
+    <ClInclude Include="src\NetworkChecker.h" />
+    <ClInclude Include="src\HtmlExporter.h" />
+  </ItemGroup>
+
+  <!-- ── Resource files ────────────────────────────────────────────────────── -->
+  <ItemGroup>
+    <ResourceCompile Include="src\NetPortChk.rc" />
+  </ItemGroup>
+
+  <!-- ── Manifest ──────────────────────────────────────────────────────────── -->
+  <ItemGroup>
+    <None Include="src\NetPortChk.manifest" />
+    <None Include="scripts\increment_build.ps1" />
+  </ItemGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+
+</Project>
