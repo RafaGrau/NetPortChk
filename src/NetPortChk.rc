@@ -15,7 +15,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Espaï¿½ol (Espaï¿½a) resources
+// Espaóol (Espaóa) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
@@ -53,6 +53,7 @@ IDI_ICON_PORT_DEL  ICON  "..\\res\\port_del.ico"
 IDI_ICON_PORT_EDIT ICON  "..\\res\\port_edit.ico"
 IDI_ICON_PORT_ADD  ICON  "..\\res\\port_add.ico"
 IDI_ICON_SRV_DEL   ICON  "..\\res\\srv_del.ico"
+IDI_ICON_RPC_SCAN  ICON  "..\\res\\coms_range.ico"
 
 // cp1252: 0xE1=a 0xE9=e 0xED=i 0xF3=o 0xFA=u 0xF1=n~ 0xBF=?inv
 
@@ -130,33 +131,33 @@ END
 // ----------------------------------------------------------------------------
 // IDD_ABOUT
 // ----------------------------------------------------------------------------
-IDD_ABOUT DIALOGEX 0, 0, 270, 146
+IDD_ABOUT DIALOGEX 0, 0, 270, 152
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Acerca de NetPortChk"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     // Fila 1: icono app + nombre + subtitulo
-    ICON            IDR_MAINFRAME, IDC_STATIC, 8, 8, 32, 32
-    LTEXT           "NetPortChk  (x64)", IDC_STATIC, 48, 10, 210, 12
-    LTEXT           "Comprobador de conectividad TCP/UDP", IDC_STATIC, 48, 24, 210, 10
-    LTEXT           "", IDC_ABOUT_VERSION, 48, 36, 210, 10
+    ICON            IDR_MAINFRAME, IDC_STATIC, 7, 6, 48, 48
+    LTEXT           "NetPortChk  (x64)", IDC_STATIC, 64, 10, 198, 12
+    LTEXT           "Comprobador de conectividad TCP/UDP", IDC_STATIC, 64, 24, 198, 10
+    LTEXT           "", IDC_ABOUT_VERSION, 64, 36, 198, 10
 
-    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 50, 258, 1
+    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 56, 258, 1
 
     // Fila 2: icono GitHub + enlace URL
-    ICON            IDI_ICON_GITHUB, IDC_STATIC, 8, 56, 16, 16
-    CONTROL         "", IDC_ABOUT_LINK_GITHUB, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 30, 58, 232, 12
+    ICON            IDI_ICON_GITHUB, IDC_STATIC, 8, 62, 16, 16
+    CONTROL         "", IDC_ABOUT_LINK_GITHUB, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 30, 64, 232, 12
 
-    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 76, 258, 1
+    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 82, 258, 1
 
     // Licencia
-    LTEXT           "General Public License v3.0", IDC_STATIC, 8, 82, 254, 10
+    LTEXT           "General Public License v3.0", IDC_STATIC, 8, 88, 254, 10
 
     // Iconos
-    LTEXT           "Iconos:", IDC_STATIC, 8, 96, 28, 10
-    CONTROL         "", IDC_ABOUT_LINK_ICONS8, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 38, 96, 224, 12
+    LTEXT           "Iconos:", IDC_STATIC, 8, 102, 28, 10
+    CONTROL         "", IDC_ABOUT_LINK_ICONS8, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 38, 102, 224, 12
 
-    DEFPUSHBUTTON   "Aceptar", IDOK, 202, 126, 60, 14
+    DEFPUSHBUTTON   "Aceptar", IDOK, 202, 132, 60, 14
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -167,7 +168,7 @@ END
 
 IDD_CONFIG_EDITOR DIALOGEX 0, 0, 410, 312
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Configuraciï¿½n de servidores"
+CAPTION "Configuración de servidores"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     // -- Server form row (left-aligned). RepositionFormRow() snaps flush below toolbar.
@@ -205,15 +206,42 @@ BEGIN
     EDITTEXT        IDC_PORT_ED_PORT,43,10,44,12,ES_NUMBER|ES_AUTOHSCROLL|WS_TABSTOP
     LTEXT           "Protocolo:",IDC_STATIC,93,12,44,8
     COMBOBOX        IDC_PORT_ED_PROTO,139,10,58,40,CBS_DROPDOWNLIST|WS_TABSTOP
-    // -- Row 2-3: Descripciï¿½n (label + edit full-width) ---------------------------
-    LTEXT           "Descripciï¿½n:",IDC_STATIC,7,28,50,8
+    // -- Row 2-3: Descripción (label + edit full-width) ---------------------------
+    LTEXT           "Descripción:",IDC_STATIC,7,28,50,8
     EDITTEXT        IDC_PORT_ED_DESC,7,40,228,12,ES_AUTOHSCROLL|WS_TABSTOP
     // -- Row 4: OK / Cancel ------------------------------------------------------
     DEFPUSHBUTTON   "Aceptar",IDOK,116,64,55,14
     PUSHBUTTON      "Cancelar",IDCANCEL,177,64,58,14
 END
 
-#endif    // Espaï¿½ol (Espaï¿½a) resources
+
+/////////////////////////////////////////////////////////////////////////////
+// IDD_RPC_SCAN -- Escaner de puertos RPC dinamicos
+
+IDD_RPC_SCAN DIALOGEX 0, 0, 292, 300
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Escaneo de puertos RPC dinámicos"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    LTEXT           "IP destino:",IDC_STATIC,7,8,44,8
+    CONTROL         "",IDC_RPC_IP,"SysIPAddress32",WS_BORDER | WS_TABSTOP,45,6,80,12
+    LTEXT           "Puertos:",IDC_STATIC,140,8,28,8
+    EDITTEXT        IDC_RPC_PORT_FROM,171,6,41,12,ES_NUMBER
+    LTEXT           "-",IDC_STATIC,217,8,8,8
+    EDITTEXT        IDC_RPC_PORT_TO,223,6,42,12,ES_NUMBER
+    CONTROL         "",IDC_RPC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,1,23,291,196
+    LTEXT           "Hilos:",IDC_STATIC,7,226,24,8
+    EDITTEXT        IDC_RPC_THREADS,33,224,34,12,ES_NUMBER
+    LTEXT           "Timeout:",IDC_STATIC,74,226,32,8
+    COMBOBOX        IDC_RPC_TIMEOUT,108,224,66,50,CBS_DROPDOWNLIST | WS_TABSTOP
+    DEFPUSHBUTTON   "Escanear",IDC_RPC_BTN_SCAN,212,222,73,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,244,292,1
+    CONTROL         "",IDC_RPC_PROGRESS,"msctls_progress32",WS_BORDER,3,250,285,10
+    LTEXT           "Listo",IDC_RPC_STATUS,3,264,285,10
+    PUSHBUTTON      "Exportar CSV",IDC_RPC_BTN_EXPORT,7,278,70,14
+    DEFPUSHBUTTON   "Cerrar",IDCANCEL,230,278,55,14
+END
+#endif    // Espaóol (Espaóa) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

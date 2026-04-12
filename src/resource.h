@@ -87,6 +87,7 @@
 #define IDI_ICON_PORT_ADD  718  // reuses srv_add.ico
 #define IDI_ICON_CSV_OUT   719  // csv_out.ico (Exportar CSV)
 #define IDI_ICON_SRV_DEL   720  // srv_del.ico (Borrar servidor)
+#define IDI_ICON_RPC_SCAN  721  // coms_range.ico (Escaneo RPC)
 
 // ── Config-editor toolbar control & command IDs ───────────────────────────────
 #define IDC_CFG_TOOLBAR    630
@@ -108,3 +109,17 @@
 
 // ── About dialog – version static text ───────────────────────────────────────
 #define IDC_ABOUT_VERSION  643
+
+// ── RPC Range Scanner ────────────────────────────────────────────────────────
+#define IDC_BTN_RPC_SCAN   212          // main toolbar button
+#define IDD_RPC_SCAN       1030         // dialog
+#define IDC_RPC_IP         650          // IP edit
+#define IDC_RPC_PORT_FROM  651          // start port spin/edit
+#define IDC_RPC_PORT_TO    652          // end port spin/edit
+#define IDC_RPC_THREADS    653          // concurrent connections spin/edit
+#define IDC_RPC_TIMEOUT    654          // timeout combo
+#define IDC_RPC_LIST       655          // results listview
+#define IDC_RPC_BTN_SCAN   656          // Escanear / Detener
+#define IDC_RPC_BTN_EXPORT 657          // Exportar CSV
+#define IDC_RPC_PROGRESS   658          // progress bar
+#define IDC_RPC_STATUS     659          // status label

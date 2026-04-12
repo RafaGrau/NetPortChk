@@ -72,6 +72,7 @@ protected:
     afx_msg void OnListItemChange (NMHDR* pNMHDR, LRESULT* pResult);
     afx_msg void OnListColumnClick(NMHDR* pNMHDR, LRESULT* pResult);
     afx_msg void OnTbGetInfoTip (NMHDR* pNMHDR, LRESULT* pResult);
+    afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 
     DECLARE_MESSAGE_MAP()
 
@@ -103,6 +104,9 @@ private:
     // Helpers
     void CreateToolbar();
     void RepositionFormRow();
+    void RebuildToolbarImages(int iconPx);  // rebuild image list at given icon size
+    void DoLayout();                         // full layout pass (toolbar + form + list)
+    int  DpiScale(int logical) const;        // scale logical pixels by window DPI
     bool EditPortDlg(PortEntry& pe, bool isNew);
     void RefreshTabs();
     void SwitchToServer(int idx);

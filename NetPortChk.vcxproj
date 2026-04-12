@@ -164,6 +164,8 @@
     <ClCompile Include="src\NetworkChecker.cpp" />
     <ClCompile Include="src\HtmlExporter.cpp" />
     <ClCompile Include="src\PortDB.cpp" />
+    <ClCompile Include="src\RpcScanner.cpp" />
+    <ClCompile Include="src\RpcScanDlg.cpp" />
   </ItemGroup>
 
   <!-- ── Header files ──────────────────────────────────────────────────────── -->
@@ -181,6 +183,8 @@
     <ClInclude Include="src\ConfigManager.h" />
     <ClInclude Include="src\NetworkChecker.h" />
     <ClInclude Include="src\HtmlExporter.h" />
+    <ClInclude Include="src\RpcScanner.h" />
+    <ClInclude Include="src\RpcScanDlg.h" />
   </ItemGroup>
 
   <!-- ── Resource files ────────────────────────────────────────────────────── -->

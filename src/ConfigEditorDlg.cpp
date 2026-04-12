@@ -122,6 +122,7 @@ BEGIN_MESSAGE_MAP(CConfigEditorDlg, CDialogEx)
     ON_COMMAND(TB_PORT_DEL,  &CConfigEditorDlg::OnBtnDelPort)
 
     ON_NOTIFY(TBN_GETINFOTIP, IDC_CFG_TOOLBAR, &CConfigEditorDlg::OnTbGetInfoTip)
+    ON_MESSAGE(WM_DPICHANGED, &CConfigEditorDlg::OnDpiChanged)
 END_MESSAGE_MAP()
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -144,57 +145,75 @@ void CConfigEditorDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// DpiScale – convert a 96-DPI logical pixel value to physical pixels at the
+// current window DPI.  Safe to call before the HWND exists (returns logical).
+// ──────────────────────────────────────────────────────────────────────────────
+int CConfigEditorDlg::DpiScale(int logical) const
+{
+    HWND hWnd = GetSafeHwnd();
+    UINT dpi = hWnd ? ::GetDpiForWindow(hWnd) : 96;
+    return MulDiv(logical, static_cast<int>(dpi), 96);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// RebuildToolbarImages – destroy and recreate the toolbar image list at the
+// given icon size.  Called by CreateToolbar and by OnDpiChanged.
+// ──────────────────────────────────────────────────────────────────────────────
+void CConfigEditorDlg::RebuildToolbarImages(int iconPx)
+{
+    m_toolbar.SetImageList(nullptr);
+    m_tbImgList.DeleteImageList();
+    m_tbImgList.Create(iconPx, iconPx, ILC_COLOR32 | ILC_MASK, 8, 1);
+
+    static const UINT kIcons[] = {
+        IDI_ICON_SRV_ADD,
+        IDI_ICON_SAVE2,
+        IDI_ICON_SRV_DEL,
+        IDI_ICON_CSV_IN,
+        IDI_ICON_CSV_OUT,
+        IDI_ICON_PORT_ADD,
+        IDI_ICON_PORT_EDIT,
+        IDI_ICON_PORT_DEL,
+    };
+    for (UINT id : kIcons)
+    {
+        HICON h = static_cast<HICON>(
+            LoadImage(AfxGetInstanceHandle(),
+                      MAKEINTRESOURCE(id),
+                      IMAGE_ICON, iconPx, iconPx, LR_DEFAULTCOLOR));
+        m_tbImgList.Add(h ? h : static_cast<HICON>(nullptr));
+        if (h) DestroyIcon(h);
+    }
+
+    m_toolbar.SetImageList(&m_tbImgList);
+    m_toolbar.SendMessage(TB_SETBITMAPSIZE, 0, MAKELPARAM(iconPx, iconPx));
+
+    // Button = icon + 3 px padding each side, padding scales with DPI
+    const int pad   = DpiScale(3);
+    const int btnPx = iconPx + pad * 2;
+    m_toolbar.SendMessage(TB_SETBUTTONSIZE, 0, MAKELPARAM(btnPx, btnPx));
+    m_toolbar.AutoSize();
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // CreateToolbar
-// Builds the CToolBarCtrl docked at the top of the dialog.
-// Icon size: 32×32 (buttons 38×38 px).  TBSTYLE_TOOLTIPS enables TBN_GETINFOTIP.
 // ──────────────────────────────────────────────────────────────────────────────
 void CConfigEditorDlg::CreateToolbar()
 {
     CRect rcDlg;
     GetClientRect(&rcDlg);
-    CRect rcTb(0, 0, rcDlg.Width(), 40);   // ~38px button + 2px padding; AutoSize ajusta
 
     DWORD tbStyle = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS
                   | CCS_TOP | CCS_NODIVIDER | CCS_NORESIZE
                   | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE_LIST;
 
-    m_toolbar.Create(tbStyle, rcTb, this, IDC_CFG_TOOLBAR);
+    m_toolbar.Create(tbStyle, CRect(0, 0, rcDlg.Width(), 40), this, IDC_CFG_TOOLBAR);
     m_toolbar.SetButtonStructSize(sizeof(TBBUTTON));
     m_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
 
-    // ── Image list – 32×32 icons (ILC_COLOR32 para calidad óptima) ──────────────
-    m_tbImgList.Create(32, 32, ILC_COLOR32 | ILC_MASK, 7, 1);
-
-    auto addIcon = [&](UINT iconId) {
-        HICON h = static_cast<HICON>(
-            LoadImage(AfxGetInstanceHandle(),
-                      MAKEINTRESOURCE(iconId),
-                      IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR));
-        if (h) { m_tbImgList.Add(h); DestroyIcon(h); }
-        else     m_tbImgList.Add(static_cast<HICON>(nullptr));
-    };
-
-    // Image indices must match iImage values in the TBBUTTON array below:
-    // 0: srv_add  1: save2  2: srv_del  3: csv_in  4: csv_out  5: port_add  6: port_edit  7: port_del
-    addIcon(IDI_ICON_SRV_ADD);    // 0 – Nuevo servidor
-    addIcon(IDI_ICON_SAVE2);      // 1 – Guardar cambios
-    addIcon(IDI_ICON_SRV_DEL);    // 2 – Borrar servidor
-    addIcon(IDI_ICON_CSV_IN);     // 3 – Importar CSV
-    addIcon(IDI_ICON_CSV_OUT);    // 4 – Exportar CSV
-    addIcon(IDI_ICON_PORT_ADD);   // 5 – Agregar puerto  (port_add.ico)
-    addIcon(IDI_ICON_PORT_EDIT);  // 6 – Editar puerto   (port_edit.ico)
-    addIcon(IDI_ICON_PORT_DEL);   // 7 – Borrar puerto   (port_del.ico)
-
-    m_toolbar.SetImageList(&m_tbImgList);
-
-    // Fijar tamaños explícitos: bitmap 32×32, botón 38×38 (32 + 3px padding c/lado)
-    m_toolbar.SendMessage(TB_SETBITMAPSIZE, 0, MAKELPARAM(32, 32));
-    m_toolbar.SendMessage(TB_SETBUTTONSIZE, 0, MAKELPARAM(38, 38));
-
-    // ── Button definitions ────────────────────────────────────────────────────
+    // ── Button definitions (image indices set; sizes applied in RebuildToolbarImages) ─
     TBBUTTON tbb[12]{};
     int n = 0;
-
     auto btn = [&](UINT id, int img) {
         tbb[n].idCommand = id;
         tbb[n].iBitmap   = img;
@@ -204,23 +223,48 @@ void CConfigEditorDlg::CreateToolbar()
     };
     auto sep = [&]() {
         tbb[n].fsStyle = BTNS_SEP;
-        tbb[n].iBitmap = 6;   // separator width in pixels
+        tbb[n].iBitmap = DpiScale(6);   // separator width scaled
         ++n;
     };
 
-    btn(TB_NEW_SRV,  0);  // Nuevo servidor
-    btn(TB_SAVE_SRV, 1);  // Guardar cambios
-    btn(TB_DEL_SRV,  2);  // Borrar servidor
+    btn(TB_NEW_SRV,   0);
+    btn(TB_SAVE_SRV,  1);
+    btn(TB_DEL_SRV,   2);
     sep();
-    btn(TB_CSV_IN,   3);  // Importar CSV
-    btn(TB_CSV_OUT,  4);  // Exportar CSV
+    btn(TB_CSV_IN,    3);
+    btn(TB_CSV_OUT,   4);
     sep();
-    btn(TB_PORT_ADD,  5); // Agregar puerto
-    btn(TB_PORT_EDIT, 6); // Editar puerto
-    btn(TB_PORT_DEL,  7); // Borrar puerto
+    btn(TB_PORT_ADD,  5);
+    btn(TB_PORT_EDIT, 6);
+    btn(TB_PORT_DEL,  7);
 
     m_toolbar.AddButtons(n, tbb);
+
+    // Icons are 32 px physical — load at native size, button padding scales with DPI
+    RebuildToolbarImages(32);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// DoLayout – full layout pass: resize toolbar width, reposition form + list.
+// Called from OnInitDialog, OnSize, and OnDpiChanged.
+// ──────────────────────────────────────────────────────────────────────────────
+void CConfigEditorDlg::DoLayout()
+{
+    if (!m_toolbar.GetSafeHwnd()) return;
+
+    // Stretch toolbar to full client width, preserving its auto-calculated height
+    CRect rcDlg, rcTbCur;
+    GetClientRect(&rcDlg);
+    m_toolbar.GetWindowRect(&rcTbCur);
+    ScreenToClient(&rcTbCur);
+
+    m_toolbar.SetWindowPos(nullptr, 0, 0, rcDlg.Width(), rcTbCur.Height(),
+                           SWP_NOZORDER | SWP_NOACTIVATE);
     m_toolbar.AutoSize();
+
+    // Reflow form row and list
+    RepositionFormRow();
+    PositionList();
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -228,7 +272,7 @@ void CConfigEditorDlg::CreateToolbar()
 // Snaps the server-form controls flush below the toolbar's actual bottom edge,
 // independent of DPI or system font.  X-positions match the RC layout (left-
 // aligned).  Labels are vertically centred relative to their paired control.
-// Called once from OnInitDialog after CreateToolbar().
+// Called from DoLayout (which is called from OnInitDialog, OnSize, OnDpiChanged).
 // ──────────────────────────────────────────────────────────────────────────────
 void CConfigEditorDlg::RepositionFormRow()
 {
@@ -339,7 +383,7 @@ BOOL CConfigEditorDlg::OnInitDialog()
 
     // ── Toolbar ───────────────────────────────────────────────────────────────
     CreateToolbar();
-    RepositionFormRow();   // flush form row immediately below actual toolbar bottom
+    DoLayout();   // DPI-aware: positions form row + list below toolbar
 
     // ── Server type combo ─────────────────────────────────────────────────────
     m_cbType.AddString(PortDB::TypeName(DestinationType::DC));
@@ -911,6 +955,32 @@ void CConfigEditorDlg::PositionList()
     m_tab.AdjustRect(FALSE, &rc);
     rc.DeflateRect(2, 2);
     m_list.MoveWindow(&rc);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// OnDpiChanged – rebuild toolbar icons at new DPI and re-flow layout.
+// Windows sends this when the dialog moves to a monitor with a different DPI
+// (requires PerMonitorV2 awareness, already declared in the manifest).
+// ──────────────────────────────────────────────────────────────────────────────
+LRESULT CConfigEditorDlg::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+    // Icons are 32 px physical; only button padding adapts to new DPI
+    if (m_toolbar.GetSafeHwnd())
+        RebuildToolbarImages(32);
+
+    // Move/resize dialog to the suggested rect to avoid blurriness
+    if (lParam)
+    {
+        const RECT* prc = reinterpret_cast<const RECT*>(lParam);
+        SetWindowPos(nullptr, prc->left, prc->top,
+                     prc->right  - prc->left,
+                     prc->bottom - prc->top,
+                     SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+
+    DoLayout();
+    Invalidate();
+    return 0;
 }
 
 void CConfigEditorDlg::UpdateButtonStates()

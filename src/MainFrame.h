@@ -21,6 +21,7 @@ enum TbImg
     IMG_HELP,       // help.ico       – Ayuda
     IMG_INFO,       // info.ico       – Acerca de / Info
     IMG_EXIT,
+    IMG_RPC,        // play.ico reused – Escaneo RPC
     IMG_COUNT
 };
 
@@ -54,6 +55,7 @@ protected:
     void OnInfo();
     void OnAutofit();
     void OnFileExit();
+    void OnRpcScan();
 
     // ── Update-UI handlers ───────────────────────────────────────────────────
     void OnUpdateRunStop   (CCmdUI* pCmdUI);

@@ -2,6 +2,7 @@
 #include "MainFrame.h"
 #include "ConfigEditorDlg.h"
 #include "AboutDlg.h"
+#include "RpcScanDlg.h"
 #include "resource.h"
 
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
@@ -27,6 +28,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     ON_COMMAND(IDC_BTN_HELP,        &CMainFrame::OnHelp)
     ON_COMMAND(IDC_BTN_INFO,        &CMainFrame::OnInfo)
     ON_COMMAND(IDC_BTN_EXIT,        &CMainFrame::OnFileExit)
+    ON_COMMAND(IDC_BTN_RPC_SCAN,    &CMainFrame::OnRpcScan)
 
     // Update-UI handlers
     ON_UPDATE_COMMAND_UI(IDC_BTN_RUN_STOP,   &CMainFrame::OnUpdateRunStop)
@@ -164,21 +166,33 @@ void CMainFrame::BuildToolbar()
 
     static TBBUTTON tbb[] =
     {
-        {IMG_RUN,      IDC_BTN_RUN_STOP,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Comprobar"},
+        // 1. Comprobar / Detener
+        {IMG_RUN,      IDC_BTN_RUN_STOP,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Comprobar / Detener"},
         {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 2. Editor de configuración
         {IMG_CFGEDIT,  IDC_BTN_CFG_WIZ,    TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Editor de configuraci\xf3n"},
+        // 3. Recargar configuración
         {IMG_RELOAD,   IDC_BTN_RELOAD_CFG, TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Recargar configuraci\xf3n"},
+        // 4. Guardar configuración
         {IMG_SAVE,     IDC_BTN_SAVE_CFG,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar configuraci\xf3n"},
         {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 5. Guardar informe HTML
         {IMG_HTML,     IDC_BTN_SAVE_HTML,  TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar informe HTML"},
         {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
-        {IMG_VIEW_TABS,IDC_BTN_VIEW_TOGGLE,TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Vista por pesta\xf1""as"},
+        // 6. Escaneo RPC dinámico
+        {IMG_RPC,      IDC_BTN_RPC_SCAN,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Escaneo RPC din\xe1mico"},
         {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 7. Cambiar vista
+        {IMG_VIEW_TABS,IDC_BTN_VIEW_TOGGLE,TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Cambiar vista"},
+        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 8. Salir
         {IMG_EXIT,     IDC_BTN_EXIT,       TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Salir"},
-        // stretch separator – width recalculated in OnSize to push HELP+INFO to the right edge
+        // separador elástico – empuja Ayuda e Info al extremo derecho
         {0,            IDC_BTN_INFO_SEP,   TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 9. Ayuda
         {IMG_HELP,     IDC_BTN_HELP,       TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Ayuda"},
-        {IMG_INFO,     IDC_BTN_INFO,       TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Informaci\xf3n"},
+        // 10. Acerca de
+        {IMG_INFO,     IDC_BTN_INFO,       TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Acerca de"},
     };
 
     m_toolbar.GetToolBarCtrl().AddButtons(
@@ -313,6 +327,7 @@ void CMainFrame::BuildImageLists()
         IDI_ICON_HELP,      // IMG_HELP
         IDI_ICON_INFO,      // IMG_INFO
         IDI_ICON_EXIT,      // IMG_EXIT
+        IDI_ICON_RPC_SCAN,  // IMG_RPC  coms_range.ico
     };
 
     m_ilNormal  .Create(SZ, SZ, ILC_COLOR32, IMG_COUNT, 0);
@@ -621,6 +636,28 @@ void CMainFrame::OnInfo()
     dlg.DoModal();
 }
 
+void CMainFrame::OnRpcScan()
+{
+    // Pre-fill IP from the first selected destination or the first result
+    std::wstring ip;
+    if (!m_results.empty())
+    {
+        POSITION pos = m_listCtrl.GetFirstSelectedItemPosition();
+        if (pos)
+        {
+            int item = m_listCtrl.GetNextSelectedItem(pos);
+            int di   = static_cast<int>(m_listCtrl.GetItemData(item));
+            if (di >= 0 && di < static_cast<int>(m_results.size()))
+                ip = m_results[di].config.ip;
+        }
+        if (ip.empty())
+            ip = m_results[0].config.ip;
+    }
+
+    CRpcScanDlg dlg(ip);
+    dlg.DoModal();
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Update-UI
 // ──────────────────────────────────────────────────────────────────────────────
@@ -773,6 +810,7 @@ BOOL CMainFrame::OnToolTipText(UINT /*id*/, NMHDR* pNMHDR, LRESULT* pResult)
         { IDC_BTN_RELOAD_CFG,  L"Recargar configuraci\xf3n"    },
         { IDC_BTN_SAVE_CFG,    L"Guardar configuraci\xf3n"     },
         { IDC_BTN_SAVE_HTML,   L"Guardar informe HTML"          },
+        { IDC_BTN_RPC_SCAN,    L"Escaneo RPC din\xe1mico"      },
         { IDC_BTN_VIEW_TOGGLE, L"Cambiar vista"                 },
         { IDC_BTN_EXIT,        L"Salir"                         },
         { IDC_BTN_HELP,        L"Ayuda"                         },
