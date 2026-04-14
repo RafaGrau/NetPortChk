@@ -1,6 +1,4 @@
 #include "pch.h"
-#include <algorithm>
-#include <fstream>
 #include "ConfigEditorDlg.h"
 
 // ============================================================================
