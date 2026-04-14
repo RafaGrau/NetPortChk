@@ -54,6 +54,7 @@ IDI_ICON_PORT_EDIT ICON  "..\\res\\port_edit.ico"
 IDI_ICON_PORT_ADD  ICON  "..\\res\\port_add.ico"
 IDI_ICON_SRV_DEL   ICON  "..\\res\\srv_del.ico"
 IDI_ICON_RPC_SCAN  ICON  "..\\res\\coms_range.ico"
+IDI_ICON_APP64     ICON  "..\\res\\appMain64.ico"
 
 // cp1252: 0xE1=a 0xE9=e 0xED=i 0xF3=o 0xFA=u 0xF1=n~ 0xBF=?inv
 
@@ -131,33 +132,22 @@ END
 // ----------------------------------------------------------------------------
 // IDD_ABOUT
 // ----------------------------------------------------------------------------
-IDD_ABOUT DIALOGEX 0, 0, 270, 152
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUT DIALOGEX 0, 0, 234, 121
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Acerca de NetPortChk"
 FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
-    // Fila 1: icono app + nombre + subtitulo
-    ICON            IDR_MAINFRAME, IDC_STATIC, 7, 6, 48, 48
-    LTEXT           "NetPortChk  (x64)", IDC_STATIC, 64, 10, 198, 12
-    LTEXT           "Comprobador de conectividad TCP/UDP", IDC_STATIC, 64, 24, 198, 10
-    LTEXT           "", IDC_ABOUT_VERSION, 64, 36, 198, 10
-
-    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 56, 258, 1
-
-    // Fila 2: icono GitHub + enlace URL
-    ICON            IDI_ICON_GITHUB, IDC_STATIC, 8, 62, 16, 16
-    CONTROL         "", IDC_ABOUT_LINK_GITHUB, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 30, 64, 232, 12
-
-    CONTROL         "", IDC_STATIC, "Static", SS_ETCHEDHORZ, 6, 82, 258, 1
-
-    // Licencia
-    LTEXT           "General Public License v3.0", IDC_STATIC, 8, 88, 254, 10
-
-    // Iconos
-    LTEXT           "Iconos:", IDC_STATIC, 8, 102, 28, 10
-    CONTROL         "", IDC_ABOUT_LINK_ICONS8, "SysLink", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 38, 102, 224, 12
-
-    DEFPUSHBUTTON   "Aceptar", IDOK, 202, 132, 60, 14
+    ICON            "",IDC_ABOUT_ICON,7,6,20,20,SS_REALSIZEIMAGE
+    LTEXT           "NetPortChk  (x64)",IDC_STATIC,59,7,139,8
+    LTEXT           "Comprobador de conectividad TCP/UDP",IDC_STATIC,59,19,140,8
+    LTEXT           "",IDC_ABOUT_VERSION,59,32,102,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,6,56,224,1
+    ICON            IDI_ICON_GITHUB,IDC_STATIC,8,63,16,13
+    CONTROL         "",IDC_ABOUT_LINK_GITHUB,"SysLink",WS_TABSTOP,30,65,132,10
+    LTEXT           "General Public License v3.0",IDC_STATIC,8,88,110,10
+    LTEXT           "Iconos:",IDC_STATIC,8,102,28,8
+    CONTROL         "",IDC_ABOUT_LINK_ICONS8,"SysLink",WS_TABSTOP,38,102,97,8
+    DEFPUSHBUTTON   "Aceptar",IDOK,165,99,60,14
 END
 
 /////////////////////////////////////////////////////////////////////////////

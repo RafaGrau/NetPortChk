@@ -22,7 +22,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
     ON_COMMAND(IDC_BTN_SAVE_HTML,   &CMainFrame::OnSaveHtml)
     ON_COMMAND(IDC_BTN_SAVE_CFG,    &CMainFrame::OnSaveCfg)
     ON_COMMAND(IDC_BTN_RELOAD_CFG,  &CMainFrame::OnReloadCfg)
-    ON_COMMAND(IDC_BTN_AUTOFIT,     &CMainFrame::OnAutofit)
     ON_COMMAND(IDC_BTN_VIEW_TOGGLE, &CMainFrame::OnViewToggle)
     ON_COMMAND(IDC_BTN_CFG_WIZ,     &CMainFrame::OnCfgWiz)
     ON_COMMAND(IDC_BTN_HELP,        &CMainFrame::OnHelp)
@@ -93,9 +92,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpcs)
     // ── Toolbar ───────────────────────────────────────────────────────────────
     BuildToolbar();
 
-    // Apply persisted toolbar visibility (will be set after config load)
-    // Done in DoLoadConfig once m_cfg is populated.
-
     // ── ListView ─────────────────────────────────────────────────────────────
     CRect rcClient;
     GetClientRect(&rcClient);
@@ -164,26 +160,30 @@ void CMainFrame::BuildToolbar()
         TB_SETEXTENDEDSTYLE, 0,
         TBSTYLE_EX_DOUBLEBUFFER | m_toolbar.GetToolBarCtrl().SendMessage(TB_GETEXTENDEDSTYLE, 0, 0));
 
+    // Required before TB_ADDBUTTONS
+    m_toolbar.GetToolBarCtrl().SetButtonStructSize(sizeof(TBBUTTON));
+
     static TBBUTTON tbb[] =
     {
         // 1. Comprobar / Detener
         {IMG_RUN,      IDC_BTN_RUN_STOP,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Comprobar / Detener"},
-        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
-        // 2. Editor de configuración
-        {IMG_CFGEDIT,  IDC_BTN_CFG_WIZ,    TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Editor de configuraci\xf3n"},
-        // 3. Recargar configuración
-        {IMG_RELOAD,   IDC_BTN_RELOAD_CFG, TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Recargar configuraci\xf3n"},
-        // 4. Guardar configuración
-        {IMG_SAVE,     IDC_BTN_SAVE_CFG,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar configuraci\xf3n"},
-        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
-        // 5. Guardar informe HTML
-        {IMG_HTML,     IDC_BTN_SAVE_HTML,  TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar informe HTML"},
-        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
-        // 6. Escaneo RPC dinámico
-        {IMG_RPC,      IDC_BTN_RPC_SCAN,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Escaneo RPC din\xe1mico"},
-        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
-        // 7. Cambiar vista
+        // 2. Cambiar vista
         {IMG_VIEW_TABS,IDC_BTN_VIEW_TOGGLE,TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Cambiar vista"},
+        // 3. Guardar informe HTML
+        {IMG_HTML,     IDC_BTN_SAVE_HTML,  TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar informe HTML"},
+        // Separador
+        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 4. Escaneo RPC dinámico
+        {IMG_RPC,      IDC_BTN_RPC_SCAN,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Escaneo RPC din\xe1mico"},
+        // Separador
+        {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
+        // 5. Editor de configuración
+        {IMG_CFGEDIT,  IDC_BTN_CFG_WIZ,    TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Editor de configuraci\xf3n"},
+        // 6. Guardar configuración
+        {IMG_SAVE,     IDC_BTN_SAVE_CFG,   TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Guardar configuraci\xf3n"},
+        // 7. Recargar configuración
+        {IMG_RELOAD,   IDC_BTN_RELOAD_CFG, TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Recargar configuraci\xf3n"},
+        // Separador
         {0,            0,                  TBSTATE_ENABLED, TBSTYLE_SEP,    {}, 0, 0},
         // 8. Salir
         {IMG_EXIT,     IDC_BTN_EXIT,       TBSTATE_ENABLED, TBSTYLE_BUTTON, {}, 0, (INT_PTR)L"Salir"},
@@ -516,7 +516,6 @@ LRESULT CMainFrame::OnNcResult(WPARAM wParam, LPARAM lParam)
         // Also update the matching tab-list if in tab mode
         if (m_tabMode && di < (int)m_tabLists.size())
         {
-            std::vector<DestinationResult> single = { m_results[di] };
             m_tabLists[di]->UpdateResult(0, pi, pr);
         }
         int done  = CompletedPortCount();
@@ -549,7 +548,6 @@ void CMainFrame::OnRunStop()
     else                       DoRunCheck();
 }
 
-void CMainFrame::OnStop()         { DoStopCheck(); }
 void CMainFrame::OnReloadCfg()    { DoReloadConfig(true); }
 void CMainFrame::OnSaveCfg()      { DoSaveCfg(); }
 
@@ -690,11 +688,6 @@ void CMainFrame::OnUpdateReloadCfg(CCmdUI* pCmdUI)
     pCmdUI->Enable(m_cfgExists);
 }
 
-void CMainFrame::OnAutofit()
-{
-    m_listCtrl.AutoFitColumns();
-}
-
 // ──────────────────────────────────────────────────────────────────────────────
 // WM_CLOSE – ask before exit if dirty
 // ──────────────────────────────────────────────────────────────────────────────
@@ -751,7 +744,8 @@ void CMainFrame::ApplyToolbarMetrics()
         tb.GetItemRect(btnSep,  &rcSep);
         tb.GetClientRect(&rcTb);
         int rightWidth = rcInfo.Width() + rcHelp.Width();
-        int stretch = max(8, rcTb.Width() - rcSep.left - rightWidth - 4);
+        // 2 px de margen final para evitar que el último botón quede al borde
+        int stretch = max(8, rcTb.Width() - rcSep.left - rightWidth - 2);
         TBBUTTONINFO tbi{}; tbi.cbSize = sizeof(tbi);
         tbi.dwMask = TBIF_SIZE; tbi.cx = static_cast<WORD>(stretch);
         tb.SetButtonInfo(IDC_BTN_INFO_SEP, &tbi);

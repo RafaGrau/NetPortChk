@@ -14,5 +14,6 @@
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Estados de puerto"><param name="Local" value="estados.htm"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Informe HTML"><param name="Local" value="informe.htm"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Archivo de configuración"><param name="Local" value="xmlfmt.htm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Puertos conocidos"><param name="Local" value="puertos.htm"></OBJECT>
 </UL>
 </BODY></HTML>

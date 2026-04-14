@@ -26,7 +26,6 @@
       <UniqueIdentifier>{88888888-8888-8888-8888-888888888888}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
-
   <ItemGroup>
     <!-- PCH -->
     <ClCompile Include="src\pch.cpp">
@@ -43,10 +42,7 @@
       <Filter>Origen\MFC</Filter>
     </ClCompile>
     <!-- Diálogos -->
-    <ClCompile Include="src\ConfigEditorDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-<ClCompile Include="src\AboutDlg.cpp">
+    <ClCompile Include="src\AboutDlg.cpp">
       <Filter>Origen\MFC\Diálogos</Filter>
     </ClCompile>
     <!-- Lógica -->
@@ -65,8 +61,10 @@
     <ClCompile Include="src\PortDB.cpp">
       <Filter>Origen\Lógica</Filter>
     </ClCompile>
+    <ClCompile Include="src\ConfigEditorDlg.cpp" />
+    <ClCompile Include="src\RpcScanner.cpp" />
+    <ClCompile Include="src\RpcScanDlg.cpp" />
   </ItemGroup>
-
   <ItemGroup>
     <!-- PCH header -->
     <ClInclude Include="src\pch.h">
@@ -88,10 +86,7 @@
     <ClInclude Include="src\ResultListCtrl.h">
       <Filter>Cabeceras\MFC</Filter>
     </ClInclude>
-    <ClInclude Include="src\ConfigEditorDlg.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-<ClInclude Include="src\AboutDlg.h">
+    <ClInclude Include="src\AboutDlg.h">
       <Filter>Cabeceras\MFC</Filter>
     </ClInclude>
     <!-- Logic headers -->
@@ -107,8 +102,11 @@
     <ClInclude Include="src\HtmlExporter.h">
       <Filter>Cabeceras\Lógica</Filter>
     </ClInclude>
+    <ClInclude Include="src\version.h" />
+    <ClInclude Include="src\ConfigEditorDlg.h" />
+    <ClInclude Include="src\RpcScanner.h" />
+    <ClInclude Include="src\RpcScanDlg.h" />
   </ItemGroup>
-
   <ItemGroup>
     <ResourceCompile Include="src\NetPortChk.rc">
       <Filter>Recursos</Filter>
@@ -116,5 +114,33 @@
     <None Include="src\NetPortChk.manifest">
       <Filter>Recursos</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scripts\increment_build.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\appMain.ico" />
+    <Image Include="res\play.ico" />
+    <Image Include="res\stop.ico" />
+    <Image Include="res\html.ico" />
+    <Image Include="res\cfg_save.ico" />
+    <Image Include="res\cfg_reload.ico" />
+    <Image Include="res\cfg_edit.ico" />
+    <Image Include="res\info.ico" />
+    <Image Include="res\exit.ico" />
+    <Image Include="res\help.ico" />
+    <Image Include="res\srv_add.ico" />
+    <Image Include="res\save.ico" />
+    <Image Include="res\github.ico" />
+    <Image Include="res\view_tabs.ico" />
+    <Image Include="res\view_list.ico" />
+    <Image Include="res\csv_in.ico" />
+    <Image Include="res\csv_out.ico" />
+    <Image Include="res\port_del.ico" />
+    <Image Include="res\port_edit.ico" />
+    <Image Include="res\port_add.ico" />
+    <Image Include="res\srv_del.ico" />
+    <Image Include="res\coms_range.ico" />
+    <Image Include="res\appMain64.ico" />
   </ItemGroup>
 </Project>

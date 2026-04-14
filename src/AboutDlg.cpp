@@ -20,7 +20,23 @@ BOOL CAboutDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    // Version string built from version.h macros
+    // ── Icono 64×64 ───────────────────────────────────────────────────────────
+    // Carga el icono a 64 px físicos con DPI-awareness y lo asigna al control.
+    // Se guarda en m_hIcon64 para liberarlo al destruir el diálogo.
+    {
+        UINT dpi = ::GetDpiForWindow(GetSafeHwnd());
+        int  sz  = MulDiv(64, static_cast<int>(dpi), 96);
+        m_hIcon64 = static_cast<HICON>(
+            ::LoadImageW(AfxGetInstanceHandle(),
+                         MAKEINTRESOURCEW(IDI_ICON_APP64),
+                         IMAGE_ICON, sz, sz, LR_DEFAULTCOLOR));
+        if (m_hIcon64)
+        {
+            if (auto* pCtrl = GetDlgItem(IDC_ABOUT_ICON))
+                pCtrl->SendMessage(STM_SETIMAGE, IMAGE_ICON,
+                                   reinterpret_cast<LPARAM>(m_hIcon64));
+        }
+    }
     CString verStr;
     verStr.Format(L"Versi\xf3n %d.%d.%d.%d",
                   VER_MAJOR, VER_MINOR, VER_PATCH, VER_BUILD);

@@ -15,7 +15,6 @@
 #define IDC_BTN_SAVE_HTML       202
 #define IDC_BTN_SAVE_CFG        203
 #define IDC_BTN_RELOAD_CFG      204
-#define IDC_BTN_AUTOFIT         205
 #define IDC_BTN_CFG_WIZ         206
 #define IDC_BTN_INFO            207
 #define IDC_BTN_HELP            211
@@ -88,6 +87,7 @@
 #define IDI_ICON_CSV_OUT   719  // csv_out.ico (Exportar CSV)
 #define IDI_ICON_SRV_DEL   720  // srv_del.ico (Borrar servidor)
 #define IDI_ICON_RPC_SCAN  721  // coms_range.ico (Escaneo RPC)
+#define IDI_ICON_APP64     722  // appMain64.ico  (About dialog, 64x64)
 
 // ── Config-editor toolbar control & command IDs ───────────────────────────────
 #define IDC_CFG_TOOLBAR    630
@@ -109,6 +109,7 @@
 
 // ── About dialog – version static text ───────────────────────────────────────
 #define IDC_ABOUT_VERSION  643
+#define IDC_ABOUT_ICON     644  // 64×64 app icon in About dialog
 
 // ── RPC Range Scanner ────────────────────────────────────────────────────────
 #define IDC_BTN_RPC_SCAN   212          // main toolbar button

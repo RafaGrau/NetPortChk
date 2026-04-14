@@ -7,19 +7,6 @@
 #include <locale>
 
 // ──────────────────────────────────────────────────────────────────────────────
-// HtmlColor – CSS colour for a ConnectStatus value
-// ──────────────────────────────────────────────────────────────────────────────
-static std::wstring HtmlColor(ConnectStatus s)
-{
-    switch (s) {
-    case ConnectStatus::OK:      return L"#009000";
-    case ConnectStatus::FAILED:  return L"#c80000";
-    case ConnectStatus::UNKNOWN: return L"#b47800";
-    default:                     return L"#969696";
-    }
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
 // Export
 // ──────────────────────────────────────────────────────────────────────────────
 bool HtmlExporter::Export(const wchar_t* path,

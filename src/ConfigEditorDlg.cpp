@@ -274,78 +274,81 @@ void CConfigEditorDlg::DoLayout()
 // ──────────────────────────────────────────────────────────────────────────────
 void CConfigEditorDlg::RepositionFormRow()
 {
-    // ── 1. Toolbar bottom in client pixels ────────────────────────────────────
+    // ── 1. Toolbar bottom en pixels cliente ───────────────────────────────────
     CRect rcTb;
     m_toolbar.GetWindowRect(&rcTb);
     ScreenToClient(&rcTb);
     const int tbBottom = rcTb.bottom;
 
-    // ── 2. Map one DU to pixels via MapDialogRect ────────────────────────────
-    //    We'll use it to convert the fixed margin (2 DU) to pixels.
-    CRect duRef(0, 0, 4, 8);   // 4 DU wide, 8 DU tall (base unit reference)
+    // ── 2. 1 DU vertical → píxeles (para el margen superior) ─────────────────
+    CRect duRef(0, 0, 4, 8);
     MapDialogRect(&duRef);
-    const int duW = duRef.Width()  / 4;  // pixels per horizontal DU
-    const int duH = duRef.Height() / 8;  // pixels per vertical DU
+    const int duH = duRef.Height() / 8;
 
-    // ── 3. Compute row top in pixels (toolbar bottom + 2px gap) ──────────────
-    const int editTop = tbBottom + 2 * duH;
+    // ── 3. Fila top = toolbar bottom + 2 DU de margen ─────────────────────────
+    const int rowTop = tbBottom + 2 * duH;
 
-    // Helper: get a control's current pixel rect in client coords
+    // Helper: rect de un control en coords cliente
     auto getRC = [&](int id) -> CRect {
         CRect r;
         if (auto* p = GetDlgItem(id)) { p->GetWindowRect(&r); ScreenToClient(&r); }
         return r;
     };
 
-    // Helper: move a control to (x, y) keeping its current size
-    auto moveTo = [&](int id, int xPx, int yPx) {
+    // Helper: mover un control a (x, rowTop) conservando su tamaño actual
+    auto moveTo = [&](int id, int x, int y) {
         if (auto* p = GetDlgItem(id)) {
             CRect r; p->GetWindowRect(&r); ScreenToClient(&r);
-            p->SetWindowPos(nullptr, xPx, yPx, r.Width(), r.Height(),
+            p->SetWindowPos(nullptr, x, y, r.Width(), r.Height(),
                             SWP_NOZORDER | SWP_NOACTIVATE);
         }
     };
 
-    // Helper: centre a label vertically relative to a paired edit/combo height
-    auto labelTop = [&](int editH, int lblH) -> int {
-        return editTop + (editH - lblH) / 2;
+    // ── 4. Obtener anchos reales de cada control ───────────────────────────────
+    const int wLblName  = getRC(IDC_CFG_LBL_NAME).Width();
+    const int hEdtName  = getRC(IDC_CFG_EDIT_NAME).Height();
+    const int wEdtName  = getRC(IDC_CFG_EDIT_NAME).Width();
+    const int wLblIP    = getRC(IDC_CFG_LBL_IP).Width();
+    const int hCtrlIP   = getRC(IDC_CFG_EDIT_IP).Height();
+    const int wCtrlIP   = getRC(IDC_CFG_EDIT_IP).Width();
+    const int wLblType  = getRC(IDC_CFG_LBL_TYPE).Width();
+    const int hCombo    = getRC(IDC_CFG_COMBO_TYPE).Height();
+    const int hLblName  = getRC(IDC_CFG_LBL_NAME).Height();
+    const int hLblIP    = getRC(IDC_CFG_LBL_IP).Height();
+    const int hLblType  = getRC(IDC_CFG_LBL_TYPE).Height();
+
+    // ── 5. Gaps: entre etiqueta y control, y entre grupos ─────────────────────
+    // Usar MulDiv para escalar con DPI: 4 y 10 px lógicos a 96 DPI
+    UINT dpi = GetDpiForWindow(GetSafeHwnd());
+    const int gapInner  = MulDiv(4,  static_cast<int>(dpi), 96);  // label → control
+    const int gapGroup  = MulDiv(10, static_cast<int>(dpi), 96);  // control → siguiente label
+    const int xLeft     = MulDiv(7,  static_cast<int>(dpi), 96);  // margen izquierdo
+
+    // ── 6. Calcular posiciones X de izquierda a derecha ───────────────────────
+    const int xLblNom  = xLeft;
+    const int xEdtNom  = xLblNom + wLblName + gapInner;
+    const int xLblIP   = xEdtNom + wEdtName + gapGroup;
+    const int xCtrlIP  = xLblIP  + wLblIP   + gapInner;
+    const int xLblTyp  = xCtrlIP + wCtrlIP  + gapGroup;
+    const int xCboTyp  = xLblTyp + wLblType + gapInner;
+
+    // ── 7. Centrar verticalmente etiquetas respecto a su control ─────────────
+    auto labelY = [&](int editH, int lblH) -> int {
+        return rowTop + (editH - lblH) / 2;
     };
 
-    // ── 4. Get reference heights from actual controls ─────────────────────────
-    CRect rcName   = getRC(IDC_CFG_EDIT_NAME);
-    CRect rcIP     = getRC(IDC_CFG_EDIT_IP);
-    CRect rcCombo  = getRC(IDC_CFG_COMBO_TYPE);
-    CRect rcLblN   = getRC(IDC_CFG_LBL_NAME);
-    CRect rcLblIP  = getRC(IDC_CFG_LBL_IP);
-    CRect rcLblT   = getRC(IDC_CFG_LBL_TYPE);
+    moveTo(IDC_CFG_EDIT_NAME,   xEdtNom, rowTop);
+    moveTo(IDC_CFG_EDIT_IP,     xCtrlIP, rowTop);
+    moveTo(IDC_CFG_COMBO_TYPE,  xCboTyp, rowTop);
 
-    const int lblH = rcLblN.Height();
+    moveTo(IDC_CFG_LBL_NAME,  xLblNom, labelY(hEdtName, hLblName));
+    moveTo(IDC_CFG_LBL_IP,    xLblIP,  labelY(hCtrlIP,  hLblIP));
+    moveTo(IDC_CFG_LBL_TYPE,  xLblTyp, labelY(hCombo,   hLblType));
 
-    // ── 5. X-positions from RC layout (DU → px):
-    //   "Nombre:"  x=7  edit  x=45 w=100
-    //   "IP:"      x=153 ctrl x=169 w=88
-    //   "Tipo:"    x=265 combo x=291 w=110
-    //   (all left-aligned, separator to x=490)
-    const int xLblNom = 7  * duW;
-    const int xEdtNom = 45 * duW;
-    const int xLblIP  = 153 * duW;
-    const int xCtrlIP = 169 * duW;
-    const int xLblTyp = 265 * duW;
-    const int xCboTyp = 291 * duW;
-
-    // Edits/combos all share the same top
-    moveTo(IDC_CFG_EDIT_NAME,   xEdtNom, editTop);
-    moveTo(IDC_CFG_EDIT_IP,     xCtrlIP, editTop);
-    moveTo(IDC_CFG_COMBO_TYPE,  xCboTyp, editTop);
-
-    // Labels vertically centred relative to their paired control
-    moveTo(IDC_CFG_LBL_NAME,  xLblNom, labelTop(rcName.Height(),  lblH));
-    moveTo(IDC_CFG_LBL_IP,    xLblIP,  labelTop(rcIP.Height(),    lblH));
-    moveTo(IDC_CFG_LBL_TYPE,  xLblTyp, labelTop(rcCombo.Height(), lblH));
-
-    // ── 6. Separator: 2px below edit bottom, full client width ───────────────
-    const int editBottom = editTop + rcName.Height();
-    const int sepTop     = editBottom + 2;
+    // ── 8. Separador: 2px bajo la fila, ancho cliente completo ───────────────
+    const int rowH  = (hEdtName > hCtrlIP ? hEdtName : hCtrlIP) > hCombo
+                      ? (hEdtName > hCtrlIP ? hEdtName : hCtrlIP) : hCombo;
+    const int sepTop = rowTop + rowH + 2;
     if (auto* p = GetDlgItem(IDC_CFG_TOOLBAR_SEP))
     {
         CRect rcDlg; GetClientRect(&rcDlg);
@@ -353,7 +356,7 @@ void CConfigEditorDlg::RepositionFormRow()
                         SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
-    // ── 7. Tab + list: shift down by delta from original tab top ─────────────
+    // ── 9. Tab + list: desplazar según delta desde posición actual ────────────
     const int tabTop = sepTop + 2;
 
     CRect rcTab, rcList;

@@ -31,9 +31,10 @@ void CResultListCtrl::Initialise()
     InsertColumn(COL_TX,      L"Tx (bytes)",   LVCFMT_RIGHT,   70);
     InsertColumn(COL_RX,      L"Rx (bytes)",   LVCFMT_RIGHT,   70);
 
-    // Visual order:  Destino | Puerto | Activo(check) | Protocolo | Desc | Estado | Latencia
+    // Visual order:  Destino | Puerto | Activo(check) | Protocolo | Desc | Estado | Latencia | Tx | Rx
     int order[COL_COUNT] = { COL_DEST, COL_PORT, COL_CHECK,
-                              COL_PROTO, COL_DESC, COL_STATUS, COL_LATENCY };
+                              COL_PROTO, COL_DESC, COL_STATUS, COL_LATENCY,
+                              COL_TX, COL_RX };
     SetColumnOrderArray(COL_COUNT, order);
     AutoFitColumns();
 }

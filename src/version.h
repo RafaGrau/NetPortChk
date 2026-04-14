@@ -3,7 +3,7 @@
 // version.h  –  Single source of truth for NetPortChk version numbers.
 //
 // VER_BUILD is incremented automatically by the pre-build script
-// (scripts/increment_build.py) on every successful compilation.
+// (scripts/increment_build.ps1) on every successful compilation.
 //
 // To bump the project version manually, edit VER_MAJOR / VER_MINOR / VER_PATCH
 // and reset VER_BUILD to 0.
@@ -12,7 +12,7 @@
 #define VER_MAJOR   1
 #define VER_MINOR   4
 #define VER_PATCH   0
-#define VER_BUILD   1
+#define VER_BUILD   10
 
 // Helper macros used by the RC file
 #define VER_FILEVERSION      VER_MAJOR,VER_MINOR,VER_PATCH,VER_BUILD

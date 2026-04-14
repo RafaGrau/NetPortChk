@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <!-- ── Project Configurations ────────────────────────────────────────────── -->
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -12,7 +11,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <!-- ── Globals ──────────────────────────────────────────────────────────── -->
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -21,9 +19,7 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-
   <!-- ── Per-configuration properties ─────────────────────────────────────── -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -32,7 +28,6 @@
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -41,22 +36,15 @@
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
-
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
-            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
-            Label="LocalAppDataPlatform" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
-            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
-            Label="LocalAppDataPlatform" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-
   <!-- ── Compiler & Linker (Debug x64) ─────────────────────────────────────── -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
@@ -97,7 +85,6 @@
       <Message>Compilando ayuda CHM...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-
   <!-- ── Compiler & Linker (Release x64) ──────────────────────────────────── -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
@@ -141,23 +128,19 @@
       <Message>Compilando ayuda CHM...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-
   <!-- ── Source files ──────────────────────────────────────────────────────── -->
   <ItemGroup>
     <!-- PCH -->
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-
     <!-- Application -->
     <ClCompile Include="src\NetPortChk.cpp" />
     <ClCompile Include="src\MainFrame.cpp" />
     <ClCompile Include="src\ResultListCtrl.cpp" />
-
     <!-- Dialogs -->
     <ClCompile Include="src\ConfigEditorDlg.cpp" />
-<ClCompile Include="src\AboutDlg.cpp" />
-
+    <ClCompile Include="src\AboutDlg.cpp" />
     <!-- Business logic -->
     <ClCompile Include="src\XmlLite.cpp" />
     <ClCompile Include="src\ConfigManager.cpp" />
@@ -167,7 +150,6 @@
     <ClCompile Include="src\RpcScanner.cpp" />
     <ClCompile Include="src\RpcScanDlg.cpp" />
   </ItemGroup>
-
   <!-- ── Header files ──────────────────────────────────────────────────────── -->
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
@@ -178,7 +160,7 @@
     <ClInclude Include="src\MainFrame.h" />
     <ClInclude Include="src\ResultListCtrl.h" />
     <ClInclude Include="src\ConfigEditorDlg.h" />
-<ClInclude Include="src\AboutDlg.h" />
+    <ClInclude Include="src\AboutDlg.h" />
     <ClInclude Include="src\XmlLite.h" />
     <ClInclude Include="src\ConfigManager.h" />
     <ClInclude Include="src\NetworkChecker.h" />
@@ -186,19 +168,40 @@
     <ClInclude Include="src\RpcScanner.h" />
     <ClInclude Include="src\RpcScanDlg.h" />
   </ItemGroup>
-
   <!-- ── Resource files ────────────────────────────────────────────────────── -->
   <ItemGroup>
     <ResourceCompile Include="src\NetPortChk.rc" />
   </ItemGroup>
-
   <!-- ── Manifest ──────────────────────────────────────────────────────────── -->
   <ItemGroup>
     <None Include="src\NetPortChk.manifest" />
     <None Include="scripts\increment_build.ps1" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Image Include="res\appMain.ico" />
+    <Image Include="res\appMain64.ico" />
+    <Image Include="res\cfg_edit.ico" />
+    <Image Include="res\cfg_reload.ico" />
+    <Image Include="res\cfg_save.ico" />
+    <Image Include="res\coms_range.ico" />
+    <Image Include="res\csv_in.ico" />
+    <Image Include="res\csv_out.ico" />
+    <Image Include="res\exit.ico" />
+    <Image Include="res\github.ico" />
+    <Image Include="res\help.ico" />
+    <Image Include="res\html.ico" />
+    <Image Include="res\info.ico" />
+    <Image Include="res\play.ico" />
+    <Image Include="res\port_add.ico" />
+    <Image Include="res\port_del.ico" />
+    <Image Include="res\port_edit.ico" />
+    <Image Include="res\save.ico" />
+    <Image Include="res\srv_add.ico" />
+    <Image Include="res\srv_del.ico" />
+    <Image Include="res\stop.ico" />
+    <Image Include="res\view_list.ico" />
+    <Image Include="res\view_tabs.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
-
 </Project>

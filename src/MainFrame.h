@@ -45,7 +45,6 @@ protected:
 
     // ── Toolbar button handlers ──────────────────────────────────────────────
     void OnRunStop();
-    void OnStop();
     void OnSaveHtml();
     void OnSaveCfg();
     void OnReloadCfg();
@@ -53,7 +52,6 @@ protected:
     void OnViewToggle();
     void OnHelp();
     void OnInfo();
-    void OnAutofit();
     void OnFileExit();
     void OnRpcScan();
 
