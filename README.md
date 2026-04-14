@@ -8,9 +8,11 @@ de forma asíncrona, con informe HTML exportable.
 
 Desarrollada con la asistencia de **Claude Sonnet** (Anthropic).  
 
-<img width="894" height="616" alt="image" src="https://github.com/user-attachments/assets/d018aaad-282e-42a7-a868-696c571c8415" />
+---
 
-<img width="820" height="817" alt="image" src="https://github.com/user-attachments/assets/caea3c08-855e-4ab1-afe8-9bafd05e836d" />
+<img width="1002" height="628" alt="image" src="https://github.com/user-attachments/assets/37c5ef00-ce89-4abf-ab2d-d9bf5b54eb1f" />
+
+<img width="820" height="817" alt="image" src="https://github.com/user-attachments/assets/84dda712-c1b3-4acf-9d35-0b787dc53953" />
 
 ---
 
