@@ -7,6 +7,27 @@
 #include <locale>
 
 // ──────────────────────────────────────────────────────────────────────────────
+// HtmlEscape – escapa caracteres especiales para evitar inyección HTML/XSS.
+// Sin esto, un nombre de servidor o descripción con < > & " ' rompería el
+// HTML resultante o ejecutaría script al abrir el informe en el navegador.
+// ──────────────────────────────────────────────────────────────────────────────
+static std::wstring HtmlEscape(const std::wstring& s)
+{
+    std::wstring r; r.reserve(s.size());
+    for (wchar_t c : s) {
+        switch (c) {
+        case L'&':  r += L"&amp;";  break;
+        case L'<':  r += L"&lt;";   break;
+        case L'>':  r += L"&gt;";   break;
+        case L'"':  r += L"&quot;"; break;
+        case L'\'': r += L"&#39;";  break;
+        default:    r += c;
+        }
+    }
+    return r;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Export
 // ──────────────────────────────────────────────────────────────────────────────
 bool HtmlExporter::Export(const wchar_t* path,
@@ -63,16 +84,16 @@ bool HtmlExporter::Export(const wchar_t* path,
       << L"<h1>"
       << L"<span class=\"r1\">NetPortChk Connectivity Report &nbsp;&mdash;&nbsp; " << ts << L"</span>"
       << L"<span class=\"r2\">IP Origen: "
-      << (sourceIP.empty() ? L"(desconocida)" : sourceIP)
+      << (sourceIP.empty() ? std::wstring(L"(desconocida)") : HtmlEscape(sourceIP))
       << L" &nbsp;&nbsp;&nbsp;&nbsp; (Timeout: " << timeoutMs << L" ms)"
       << L"</span></h1>\n";
 
     // ── Results table per destination ─────────────────────────────────────────
     for (const auto& dr : results)
     {
-        f << L"<h2>IP Destino: " << dr.config.ip
-          << L" &nbsp;&nbsp;&nbsp;&nbsp; Hostname: " << dr.config.name
-          << L" &nbsp;&mdash;&nbsp; (" << PortDB::TypeName(dr.config.type) << L")</h2>\n"
+        f << L"<h2>IP Destino: " << HtmlEscape(dr.config.ip)
+          << L" &nbsp;&nbsp;&nbsp;&nbsp; Hostname: " << HtmlEscape(dr.config.name)
+          << L" &nbsp;&mdash;&nbsp; (" << HtmlEscape(PortDB::TypeName(dr.config.type)) << L")</h2>\n"
           << L"<table>"
           << L"<colgroup><col class=\"c-port\"><col class=\"c-proto\"><col class=\"c-desc\">"
           << L"<col class=\"c-status\"><col class=\"c-lat\"><col class=\"c-tx\"><col class=\"c-rx\"></colgroup>"
@@ -99,7 +120,7 @@ bool HtmlExporter::Export(const wchar_t* path,
                 }
                 f << L"<tr><td>" << pr.entry.port << L"</td><td>"
                   << StrUtil::ProtoText(pr.entry.protocol) << L"</td><td>"
-                  << pr.entry.description
+                  << HtmlEscape(pr.entry.description)
                   << L"</td><td class=\"" << cls << L"\">"
                   << StrUtil::StatusText(pr.status) << L"</td><td>"
                   << (pr.status == ConnectStatus::OK ? std::to_wstring(pr.latencyMs) : L"&mdash;")

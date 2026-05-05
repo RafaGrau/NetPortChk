@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "ConfigEditorDlg.h"
+#include <codecvt>
+#include <locale>
 
 // ============================================================================
 // CPortEditorDlg
@@ -111,13 +113,13 @@ BEGIN_MESSAGE_MAP(CConfigEditorDlg, CDialogEx)
 
     // Toolbar
     ON_COMMAND(TB_NEW_SRV,   &CConfigEditorDlg::OnBtnNewServer)
-    ON_COMMAND(TB_SAVE_SRV,  &CConfigEditorDlg::OnBtnAddServer)
     ON_COMMAND(TB_DEL_SRV,   &CConfigEditorDlg::OnTbDelServer)
     ON_COMMAND(TB_CSV_IN,    &CConfigEditorDlg::OnBtnImportCsv)
     ON_COMMAND(TB_CSV_OUT,   &CConfigEditorDlg::OnBtnExportCsv)
     ON_COMMAND(TB_PORT_ADD,  &CConfigEditorDlg::OnTbPortAdd)
     ON_COMMAND(TB_PORT_EDIT, &CConfigEditorDlg::OnTbPortEdit)
     ON_COMMAND(TB_PORT_DEL,  &CConfigEditorDlg::OnBtnDelPort)
+    ON_COMMAND(TB_SAVE_SRV,  &CConfigEditorDlg::OnBtnAddServer)
 
     ON_NOTIFY(TBN_GETINFOTIP, IDC_CFG_TOOLBAR, &CConfigEditorDlg::OnTbGetInfoTip)
     ON_MESSAGE(WM_DPICHANGED, &CConfigEditorDlg::OnDpiChanged)
@@ -163,15 +165,18 @@ void CConfigEditorDlg::RebuildToolbarImages(int iconPx)
     m_tbImgList.DeleteImageList();
     m_tbImgList.Create(iconPx, iconPx, ILC_COLOR32 | ILC_MASK, 8, 1);
 
+    // Orden: índice imagen 0..7 según btn(ID, img) en CreateToolbar
+    // 0=NEW_SRV, 1=SAVE_SRV, 2=DEL_SRV, 3=CSV_IN, 4=CSV_OUT,
+    // 5=PORT_ADD, 6=PORT_EDIT, 7=PORT_DEL
     static const UINT kIcons[] = {
-        IDI_ICON_SRV_ADD,
-        IDI_ICON_SAVE2,
-        IDI_ICON_SRV_DEL,
-        IDI_ICON_CSV_IN,
-        IDI_ICON_CSV_OUT,
-        IDI_ICON_PORT_ADD,
-        IDI_ICON_PORT_EDIT,
-        IDI_ICON_PORT_DEL,
+        IDI_ICON_SRV_ADD,    // 0 → TB_NEW_SRV
+        IDI_ICON_SAVE2,      // 1 → TB_SAVE_SRV
+        IDI_ICON_SRV_DEL,    // 2 → TB_DEL_SRV
+        IDI_ICON_CSV_IN,     // 3 → TB_CSV_IN
+        IDI_ICON_CSV_OUT,    // 4 → TB_CSV_OUT
+        IDI_ICON_PORT_ADD,   // 5 → TB_PORT_ADD
+        IDI_ICON_PORT_EDIT,  // 6 → TB_PORT_EDIT
+        IDI_ICON_PORT_DEL,   // 7 → TB_PORT_DEL
     };
     for (UINT id : kIcons)
     {
@@ -179,8 +184,25 @@ void CConfigEditorDlg::RebuildToolbarImages(int iconPx)
             LoadImage(AfxGetInstanceHandle(),
                       MAKEINTRESOURCE(id),
                       IMAGE_ICON, iconPx, iconPx, LR_DEFAULTCOLOR));
-        m_tbImgList.Add(h ? h : static_cast<HICON>(nullptr));
-        if (h) DestroyIcon(h);
+        if (h)
+        {
+            m_tbImgList.Add(h);
+            DestroyIcon(h);
+        }
+        else
+        {
+            // Si el icono no se encuentra, reservar un slot vacío para
+            // mantener alineados los índices del resto de botones.
+            // ImageList::Add(nullptr) no es seguro y puede desindexar todo.
+            HBITMAP hBlank = ::CreateBitmap(iconPx, iconPx, 1, 32, nullptr);
+            if (hBlank)
+            {
+                m_tbImgList.Add(CBitmap::FromHandle(hBlank),
+                                static_cast<CBitmap*>(nullptr));
+                ::DeleteObject(hBlank);
+            }
+            TRACE(L"WARN: icono %u no encontrado en recursos\n", id);
+        }
     }
 
     m_toolbar.SetImageList(&m_tbImgList);
@@ -210,7 +232,7 @@ void CConfigEditorDlg::CreateToolbar()
     m_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
 
     // ── Button definitions (image indices set; sizes applied in RebuildToolbarImages) ─
-    TBBUTTON tbb[12]{};
+    TBBUTTON tbb[13]{};
     int n = 0;
     auto btn = [&](UINT id, int img) {
         tbb[n].idCommand = id;
@@ -226,7 +248,6 @@ void CConfigEditorDlg::CreateToolbar()
     };
 
     btn(TB_NEW_SRV,   0);
-    btn(TB_SAVE_SRV,  1);
     btn(TB_DEL_SRV,   2);
     sep();
     btn(TB_CSV_IN,    3);
@@ -235,6 +256,8 @@ void CConfigEditorDlg::CreateToolbar()
     btn(TB_PORT_ADD,  5);
     btn(TB_PORT_EDIT, 6);
     btn(TB_PORT_DEL,  7);
+    sep();
+    btn(TB_SAVE_SRV,  1);
 
     m_toolbar.AddButtons(n, tbb);
 
@@ -866,6 +889,23 @@ void CConfigEditorDlg::OnIpChanged(NMHDR* /*pNMHDR*/, LRESULT* pResult)
 // ──────────────────────────────────────────────────────────────────────────────
 void CConfigEditorDlg::OnOK()
 {
+    if (m_dirty)
+    {
+        int res = MessageBox(
+            L"Hay cambios sin guardar en el servidor actual.\r\n"
+            L"\xbf""Desea guardarlos antes de cerrar?",
+            L"Cambios pendientes",
+            MB_YESNOCANCEL | MB_ICONQUESTION);
+        if (res == IDCANCEL)
+            return;
+        if (res == IDYES)
+        {
+            OnBtnAddServer();
+            if (m_dirty)   // la validaci\xf3n fall\xf3; OnBtnAddServer ya mostr\xf3 el error
+                return;
+        }
+        // IDNO: descartar cambios del formulario y cerrar con m_servers tal como est\xe1
+    }
     if (m_servers.empty())
     {
         MessageBox(L"A\xf1""ada al menos un servidor antes de guardar.",
@@ -1015,7 +1055,7 @@ BOOL CConfigEditorDlg::PreTranslateMessage(MSG* pMsg)
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// CSV helpers (unchanged logic, same as previous version)
+// CSV helpers
 // ──────────────────────────────────────────────────────────────────────────────
 static DestinationType CsvParseType(const std::wstring& s)
 {
@@ -1042,17 +1082,68 @@ static const wchar_t* CsvTypeName(DestinationType t)
     }
     return L"DC";
 }
+// ──────────────────────────────────────────────────────────────────────────────
+// CsvSplit – parser CSV mínimo conforme a RFC 4180:
+//   - campos pueden ir entre comillas dobles
+//   - dentro de un campo entre comillas, "" representa una comilla literal
+//   - comas dentro de comillas no separan campos
+// Sin esto, un nombre de servidor con coma (legítimo: "DC, central") rompía
+// la importación.
+// ──────────────────────────────────────────────────────────────────────────────
 static std::vector<std::wstring> CsvSplit(const std::wstring& line)
 {
     std::vector<std::wstring> cols;
     std::wstring cur;
-    for (wchar_t c : line)
+    bool inQuotes = false;
+
+    for (size_t i = 0; i < line.size(); ++i)
     {
-        if (c == L',') { cols.push_back(cur); cur.clear(); }
-        else            cur += c;
+        wchar_t c = line[i];
+        if (inQuotes)
+        {
+            if (c == L'"')
+            {
+                // "" dentro de comillas → comilla literal
+                if (i + 1 < line.size() && line[i + 1] == L'"')
+                {
+                    cur += L'"';
+                    ++i;
+                }
+                else
+                {
+                    inQuotes = false;
+                }
+            }
+            else
+            {
+                cur += c;
+            }
+        }
+        else
+        {
+            if (c == L',')        { cols.push_back(cur); cur.clear(); }
+            else if (c == L'"')   { inQuotes = true; }
+            else                  { cur += c; }
+        }
     }
     cols.push_back(cur);
     return cols;
+}
+
+// Escape para emitir un campo CSV: si contiene coma, comilla o salto,
+// se rodea entre comillas y se duplican las comillas internas.
+static std::wstring CsvEscape(const std::wstring& s)
+{
+    bool needs = s.find_first_of(L",\"\r\n") != std::wstring::npos;
+    if (!needs) return s;
+    std::wstring r; r.reserve(s.size() + 2);
+    r += L'"';
+    for (wchar_t c : s) {
+        if (c == L'"') r += L"\"\"";
+        else           r += c;
+    }
+    r += L'"';
+    return r;
 }
 
 void CConfigEditorDlg::OnBtnExportCsv()
@@ -1067,13 +1158,24 @@ void CConfigEditorDlg::OnBtnExportCsv()
         L"Archivos CSV (*.csv)|*.csv|Todos (*.*)|*.*||", this);
     if (dlg.DoModal() != IDOK) { RepositionFormRow(); return; }
 
-    std::wofstream f(dlg.GetPathName().GetString());
+    // Imbuir UTF-8: por defecto wofstream usa la cp del sistema, lo que
+    // corrompe acentos al compartir el CSV entre máquinas con locale
+    // distinto. Además escribimos BOM EF BB BF para que Excel lo abra
+    // correctamente.
+    std::wofstream f(dlg.GetPathName().GetString(), std::ios::binary);
     if (!f.is_open()) { MessageBox(L"No se pudo crear el archivo.", L"Error", MB_ICONERROR); return; }
+#pragma warning(push)
+#pragma warning(disable: 4996)
+    f.imbue(std::locale(f.getloc(),
+        new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
+#pragma warning(pop)
+    f << L"\uFEFF";   // BOM para Excel
 
     f << L"hostname,ip,type,ports (port/proto)\n";
     for (const auto& srv : m_servers)
     {
-        f << srv.name << L"," << srv.ip << L"," << CsvTypeName(srv.type);
+        f << CsvEscape(srv.name) << L"," << CsvEscape(srv.ip)
+          << L"," << CsvTypeName(srv.type);
         for (const auto& pe : srv.ports)
             f << L"," << pe.port << L"/" << (pe.protocol == Protocol::TCP ? L"TCP" : L"UDP");
         f << L"\n";
@@ -1090,8 +1192,13 @@ void CConfigEditorDlg::OnBtnImportCsv()
         L"Archivos CSV (*.csv)|*.csv|Todos (*.*)|*.*||", this);
     if (dlg.DoModal() != IDOK) { RepositionFormRow(); return; }
 
-    std::wifstream f(dlg.GetPathName().GetString());
+    std::wifstream f(dlg.GetPathName().GetString(), std::ios::binary);
     if (!f.is_open()) { MessageBox(L"No se pudo abrir el archivo.", L"Error", MB_ICONERROR); return; }
+#pragma warning(push)
+#pragma warning(disable: 4996)
+    f.imbue(std::locale(f.getloc(),
+        new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
+#pragma warning(pop)
 
     int imported = 0, skipped = 0;
     std::wstring line;

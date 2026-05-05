@@ -1,126 +1,128 @@
-#pragma once
+//{{NO_DEPENDENCIES}}
+// Archivo de inclusión generado de Microsoft Visual C++.
+// Usado por NetPortChk.rc
+//
+#define VER_PATCH                       0
+#define VS_VERSION_INFO                 1
+#define VER_MAJOR                       1
+#define VER_MINOR                       5
+#define VER_BUILD                       19
+#define IDS_APP_TITLE                   101
+#define IDS_READY                       102
+#define IDS_CHECKING                    103
+#define IDS_DONE                        104
+#define IDS_UNSAVED_CHANGES             105
+#define IDR_MAINFRAME                   128
+#define IDC_BTN_RUN_STOP                201
+#define IDC_BTN_SAVE_HTML               202
+#define IDC_BTN_SAVE_CFG                203
+#define IDC_BTN_RELOAD_CFG              204
+#define IDC_BTN_CFG_WIZ                 206
+#define IDC_BTN_INFO                    207
+#define IDC_BTN_EXIT                    208
+#define IDC_BTN_INFO_SEP                209
+#define IDC_BTN_VIEW_TOGGLE             210
+#define IDC_BTN_HELP                    211
+#define IDC_BTN_RPC_SCAN                212
+#define IDC_BTN_LISTEN_TOGGLE           213
+#define IDC_BTN_NIC_SELECT              214
+#define IDC_BTN_BANNER_PROBE            215
+#define IDR_CONTEXT_LIST                401
+#define ID_CTX_ENABLE_ALL               401
+#define ID_CTX_DISABLE_ALL              402
+#define ID_CTX_ENABLE_TCP               405
+#define ID_CTX_DISABLE_TCP              406
+#define ID_CTX_ENABLE_UDP               407
+#define ID_CTX_DISABLE_UDP              408
+#define IDC_CFG_EDIT_NAME               601
+#define IDC_CFG_EDIT_IP                 602
+#define IDC_CFG_COMBO_TYPE              603
+#define IDC_CFG_BTN_ADD_SRV             604
+#define IDC_CFG_TAB                     606
+#define IDC_CFG_LIST                    607
+#define IDC_CFG_EDIT_PORT               608
+#define IDC_CFG_COMBO_PROTO             609
+#define IDC_CFG_EDIT_DESC               610
+#define IDC_CFG_BTN_ADD_PORT            611
+#define IDC_CFG_BTN_UPD_PORT            612
+#define IDC_CFG_BTN_DEL_PORT            613
+#define IDC_CFG_BTN_IMPORT_CSV          614
+#define IDC_CFG_BTN_EXPORT_CSV          615
+#define IDC_CFG_BTN_NEW_SRV             616
+#define IDC_CFG_TOOLBAR_SEP             618
+#define IDC_CFG_LBL_NAME                619
+#define IDC_ABOUT_LINK_GITHUB           620
+#define IDC_ABOUT_LINK_ICONS8           621
+#define IDC_CFG_COMBO_TIMEOUT           622
+#define IDC_CFG_LBL_IP                  623
+#define IDC_CFG_LBL_TYPE                624
+#define IDC_CFG_TOOLBAR                 630
+#define IDC_PORT_ED_PORT                640
+#define IDC_PORT_ED_PROTO               641
+#define IDC_PORT_ED_DESC                642
+#define IDC_ABOUT_VERSION               643
+#define IDC_ABOUT_ICON                  644
+#define IDC_RPC_IP                      650
+#define IDC_RPC_PORT_FROM               651
+#define IDC_RPC_PORT_TO                 652
+#define IDC_RPC_THREADS                 653
+#define IDC_RPC_TIMEOUT                 654
+#define IDC_RPC_LIST                    655
+#define IDC_RPC_BTN_SCAN                656
+#define IDC_RPC_BTN_EXPORT              657
+#define IDC_RPC_PROGRESS                658
+#define IDC_RPC_STATUS                  659
+#define IDC_NIC_LIST                    660
+#define IDC_RPC_PROTO                   661
+#define IDI_ICON_RUN                    701
+#define IDI_ICON_STOP                   702
+#define IDI_ICON_HTML                   703
+#define IDI_ICON_SAVE                   704
+#define IDI_ICON_RELOAD                 705
+#define IDI_ICON_CFGEDIT                706
+#define IDI_ICON_INFO                   707
+#define IDI_ICON_EXIT                   708
+#define IDI_ICON_GITHUB                 709
+#define IDI_ICON_VIEWTABS               710
+#define IDI_ICON_VIEWLIST               711
+#define IDI_ICON_HELP                   712
+#define IDI_ICON_SRV_ADD                713
+#define IDI_ICON_SAVE2                  714
+#define IDI_ICON_CSV_IN                 715
+#define IDI_ICON_PORT_DEL               716
+#define IDI_ICON_PORT_EDIT              717
+#define IDI_ICON_PORT_ADD               718
+#define IDI_ICON_CSV_OUT                719
+#define IDI_ICON_SRV_DEL                720
+#define IDI_ICON_RPC_SCAN               721
+#define IDI_ICON_APP64                  722
+#define IDI_ICON_SERVER                 723
+#define IDI_ICON_CLIENT                 724
+#define IDI_ICON_NETCARD                725
+#define IDI_ICON_COMS_TX_RX             726
+#define IDI_ICON_COMS_TX                727
+#define IDD_ABOUT                       1003
+#define IDD_CONFIG_EDITOR               1010
+#define IDD_PORT_EDITOR                 1020
+#define IDD_RPC_SCAN                    1030
+#define IDD_NIC_SELECT                  1040
+#define TB_NEW_SRV                      3001
+#define TB_SAVE_SRV                     3002
+#define TB_CSV_IN                       3003
+#define TB_CSV_OUT                      3004
+#define TB_PORT_ADD                     3005
+#define TB_PORT_EDIT                    3006
+#define TB_PORT_DEL                     3007
+#define TB_DEL_SRV                      3008
+#define IDC_STATIC                      -1
 
-// ── Frame / app resources ─────────────────────────────────────────────────────
-#define IDR_MAINFRAME           128   // app icon + LoadFrame ID (MFC convention)
-
-// ── String table ─────────────────────────────────────────────────────────────
-#define IDS_APP_TITLE           101
-#define IDS_READY               102
-#define IDS_CHECKING            103
-#define IDS_DONE                104
-#define IDS_UNSAVED_CHANGES     105
-
-// ── Toolbar button command IDs ────────────────────────────────────────────────
-#define IDC_BTN_RUN_STOP        201
-#define IDC_BTN_SAVE_HTML       202
-#define IDC_BTN_SAVE_CFG        203
-#define IDC_BTN_RELOAD_CFG      204
-#define IDC_BTN_CFG_WIZ         206
-#define IDC_BTN_INFO            207
-#define IDC_BTN_HELP            211
-#define IDC_BTN_INFO_SEP        209   // stretch separator before INFO (right-aligned)
-#define IDC_BTN_EXIT            208
-#define IDC_BTN_VIEW_TOGGLE     210   // toggle list/tab view
-
-// ── Context menu ──────────────────────────────────────────────────────────────
-#define IDR_CONTEXT_LIST        401
-#define ID_CTX_ENABLE_ALL       401
-#define ID_CTX_DISABLE_ALL      402
-#define ID_CTX_ENABLE_TCP       405
-#define ID_CTX_DISABLE_TCP      406
-#define ID_CTX_ENABLE_UDP       407
-#define ID_CTX_DISABLE_UDP      408
-
-// ── Dialogs ───────────────────────────────────────────────────────────────────
-#define IDD_ABOUT               1003
-#define IDD_CONFIG_EDITOR       1010
-
-// ── About dialog controls ─────────────────────────────────────────────────────
-#define IDI_ICON_GITHUB         709   // icon_github.ico – used in About dialog
-#define IDC_ABOUT_LINK_GITHUB   620
-#define IDC_ABOUT_LINK_ICONS8   621
-#define IDC_CFG_EDIT_NAME       601
-#define IDC_CFG_EDIT_IP         602
-#define IDC_CFG_COMBO_TYPE      603
-#define IDC_CFG_BTN_ADD_SRV     604
-#define IDC_CFG_TAB             606
-#define IDC_CFG_LIST            607
-#define IDC_CFG_EDIT_PORT       608
-#define IDC_CFG_COMBO_PROTO     609
-#define IDC_CFG_EDIT_DESC       610
-#define IDC_CFG_BTN_ADD_PORT    611
-#define IDC_CFG_BTN_UPD_PORT    612
-#define IDC_CFG_BTN_DEL_PORT    613
-#define IDC_CFG_BTN_IMPORT_CSV  614
-#define IDC_CFG_BTN_EXPORT_CSV  615
-#define IDC_CFG_BTN_NEW_SRV     616   // always creates new server
-#define IDC_CFG_COMBO_TIMEOUT   622   // timeout selector in config editor
-#define IDC_CFG_TOOLBAR_SEP     618   // visual separator below toolbar strip
-#define IDC_CFG_LBL_NAME        619
-#define IDC_CFG_LBL_IP          623
-#define IDC_CFG_LBL_TYPE        624
-
-
-
-
-// ── Toolbar icon resource IDs (ICON resources – ICO files embedded in EXE) ───
-#define IDI_ICON_RUN      701  // play.ico
-#define IDI_ICON_STOP     702  // stop.ico
-#define IDI_ICON_HTML     703  // html.ico
-#define IDI_ICON_SAVE     704  // cfg_save.ico
-#define IDI_ICON_RELOAD   705  // cfg_reload.ico
-#define IDI_ICON_CFGEDIT  706  // cfg_edit.ico
-#define IDI_ICON_INFO     707  // info.ico
-#define IDI_ICON_EXIT     708  // exit.ico
-#define IDI_ICON_GITHUB   709  // github.ico – About dialog
-#define IDI_ICON_VIEWTABS 710  // view_tabs.ico
-#define IDI_ICON_VIEWLIST 711  // view_list.ico
-#define IDI_ICON_HELP     712  // help.ico
-#define IDI_ICON_SRV_ADD  713  // srv_add.ico
-#define IDI_ICON_SAVE2    714  // save.ico
-
-// ── Config-editor toolbar – new icon IDs ─────────────────────────────────────
-#define IDI_ICON_CSV_IN    715  // csv_in.ico  (Importar CSV)
-#define IDI_ICON_PORT_DEL  716  // port_del.ico
-#define IDI_ICON_PORT_EDIT 717  // port_edit.ico
-#define IDI_ICON_PORT_ADD  718  // reuses srv_add.ico
-#define IDI_ICON_CSV_OUT   719  // csv_out.ico (Exportar CSV)
-#define IDI_ICON_SRV_DEL   720  // srv_del.ico (Borrar servidor)
-#define IDI_ICON_RPC_SCAN  721  // coms_range.ico (Escaneo RPC)
-#define IDI_ICON_APP64     722  // appMain64.ico  (About dialog, 64x64)
-
-// ── Config-editor toolbar control & command IDs ───────────────────────────────
-#define IDC_CFG_TOOLBAR    630
-
-#define TB_NEW_SRV         3001  // Nuevo servidor
-#define TB_SAVE_SRV        3002  // Guardar cambios
-#define TB_DEL_SRV         3008  // Borrar servidor
-#define TB_CSV_IN          3003  // Importar CSV
-#define TB_CSV_OUT         3004  // Exportar CSV
-#define TB_PORT_ADD        3005  // Agregar puerto
-#define TB_PORT_EDIT       3006  // Editar puerto
-#define TB_PORT_DEL        3007  // Borrar puerto
-
-// ── Port editor dialog ────────────────────────────────────────────────────────
-#define IDD_PORT_EDITOR    1020
-#define IDC_PORT_ED_PORT   640
-#define IDC_PORT_ED_PROTO  641
-#define IDC_PORT_ED_DESC   642
-
-// ── About dialog – version static text ───────────────────────────────────────
-#define IDC_ABOUT_VERSION  643
-#define IDC_ABOUT_ICON     644  // 64×64 app icon in About dialog
-
-// ── RPC Range Scanner ────────────────────────────────────────────────────────
-#define IDC_BTN_RPC_SCAN   212          // main toolbar button
-#define IDD_RPC_SCAN       1030         // dialog
-#define IDC_RPC_IP         650          // IP edit
-#define IDC_RPC_PORT_FROM  651          // start port spin/edit
-#define IDC_RPC_PORT_TO    652          // end port spin/edit
-#define IDC_RPC_THREADS    653          // concurrent connections spin/edit
-#define IDC_RPC_TIMEOUT    654          // timeout combo
-#define IDC_RPC_LIST       655          // results listview
-#define IDC_RPC_BTN_SCAN   656          // Escanear / Detener
-#define IDC_RPC_BTN_EXPORT 657          // Exportar CSV
-#define IDC_RPC_PROGRESS   658          // progress bar
-#define IDC_RPC_STATUS     659          // status label
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        102
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif

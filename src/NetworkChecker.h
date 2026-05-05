@@ -35,6 +35,17 @@ public:
     void SetTimeout(int ms) { m_timeoutMs = ms; }
     int  GetTimeout() const { return m_timeoutMs; }
 
+    // Local IP to bind before connect (empty = OS chooses interface).
+    void SetBindIP(const std::wstring& ip) { m_bindIP = ip; }
+    const std::wstring& GetBindIP() const  { return m_bindIP; }
+
+    // Sondeo opcional: enviar 1 byte tras el handshake TCP para forzar
+    // que el servidor envíe banner/greeting (LDAP, SMTP, RDP…). Por
+    // defecto desactivado: enviar un byte nulo a un servicio de
+    // producción puede aparecer como tráfico malformado en logs SIEM.
+    void SetBannerProbe(bool enable) { m_bannerProbe = enable; }
+    bool GetBannerProbe() const      { return m_bannerProbe; }
+
     // Returns first non-loopback IPv4 address of local machine.
     static std::wstring GetLocalIP();
 
@@ -43,10 +54,12 @@ private:
     std::atomic<bool>  m_running  { false };
     std::atomic<bool>  m_stopReq  { false };
     int                m_timeoutMs{ 1000 };  // configurable timeout
+    std::wstring       m_bindIP;             // local NIC IP, empty = auto
+    bool               m_bannerProbe{ false };// no enviar sondeos por defecto
 
     // Per-port check
-    static ConnectStatus CheckTCP(const std::wstring& ip, int port, DWORD& latMs, DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs);
-    static ConnectStatus CheckUDP(const std::wstring& ip, int port, DWORD& latMs, DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs);
+    static ConnectStatus CheckTCP(const std::wstring& ip, int port, DWORD& latMs, DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs, const std::string& bindIP, bool bannerProbe);
+    static ConnectStatus CheckUDP(const std::wstring& ip, int port, DWORD& latMs, DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs, const std::string& bindIP = {});
 
     void WorkerProc(std::vector<DestinationResult>* results,
                     ResultCb onResult, CompleteCb onComplete);

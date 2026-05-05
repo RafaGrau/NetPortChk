@@ -5,9 +5,17 @@
 
 // ──────────────────────────────────────────────────────────────────
 // Custom window messages
+// Reserved ranges (mantener documentado para evitar colisiones futuras):
+//   WM_USER + 100..199 → MainFrame (NetworkChecker, view updates)
+//   WM_USER + 200..299 → CRpcScanDlg (resultados del escáner RPC)
+//   WM_USER + 300..399 → MainFrame (UdpListener)
 // ──────────────────────────────────────────────────────────────────
-#define WM_NC_RESULT   (WM_USER + 100)   // wParam = dest idx, lParam = port idx
-#define WM_NC_COMPLETE (WM_USER + 101)   // all checks finished
+#define WM_NC_RESULT    (WM_USER + 100)   // wParam = dest idx, lParam = port idx
+#define WM_NC_COMPLETE  (WM_USER + 101)   // all checks finished
+#define WM_RPC_RESULT   (WM_USER + 200)   // lParam = ScanResultPacket*
+#define WM_RPC_PROGRESS (WM_USER + 201)   // wParam = scanned, lParam = total
+#define WM_RPC_COMPLETE (WM_USER + 202)   // scan finished
+#define WM_LISTEN_PKT   (WM_USER + 300)   // lParam = ListenPacket* (caller deletes)
 
 // ──────────────────────────────────────────────────────────────────
 // Enumerations
@@ -72,8 +80,20 @@ struct DestinationResult
 
 struct AppConfig
 {
-    int                             timeoutMs { 1000 };   // port check timeout
+    int                             timeoutMs   { 1000 };  // port check timeout
     std::vector<DestinationConfig>  destinations;
+};
+
+// ──────────────────────────────────────────────────────────────────
+// UDP listener packet (posted to main window via WM_LISTEN_PKT)
+// ──────────────────────────────────────────────────────────────────
+struct ListenPacket
+{
+    int          port     { 0 };      // puerto local que recibió el paquete
+    int          senderPort{ 0 };     // puerto origen del remitente
+    std::wstring senderIP;
+    DWORD        bytes    { 0 };
+    SYSTEMTIME   time     {};
 };
 
 // ──────────────────────────────────────────────────────────────────

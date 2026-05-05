@@ -49,6 +49,7 @@ void CResultListCtrl::PopulateResults(const std::vector<DestinationResult>& resu
     SetRedraw(FALSE);
     DeleteAllItems();
     m_rowMap.clear();
+    m_indexByDP.clear();
     RemoveAllGroups();
 
     int flatIdx = 0;
@@ -82,7 +83,8 @@ void CResultListCtrl::PopulateResults(const std::vector<DestinationResult>& resu
                 const auto& pr = dr.portResults[pi];
                 if (pr.entry.protocol != proto) continue;
 
-                m_rowMap.push_back({ di, pi });
+                m_rowMap.push_back({ di, pi, pr.status });
+                m_indexByDP[{di, pi}] = flatIdx;
 
                 LVITEM li {};
                 li.mask     = LVIF_TEXT | LVIF_GROUPID | LVIF_PARAM;
@@ -113,7 +115,15 @@ void CResultListCtrl::PopulateResults(const std::vector<DestinationResult>& resu
 
     SetRedraw(TRUE);
     Invalidate();
-    AutoFitColumns();
+
+    // AutoFitColumns es costoso (LVSCW_AUTOSIZE recorre todas las celdas
+    // por columna). Sólo lo ejecutamos la primera vez; las repoblaciones
+    // posteriores conservan el ancho ya calculado.
+    if (!m_columnsFitted)
+    {
+        AutoFitColumns();
+        m_columnsFitted = true;
+    }
 }
 
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -121,24 +131,29 @@ void CResultListCtrl::PopulateResults(const std::vector<DestinationResult>& resu
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 void CResultListCtrl::UpdateResult(int destIdx, int portIdx, const PortResult& pr)
 {
-    for (int i = 0; i < static_cast<int>(m_rowMap.size()); ++i)
-    {
-        if (m_rowMap[i].destIdx == destIdx && m_rowMap[i].portIdx == portIdx)
-        {
-            SetItemText(i, COL_STATUS,
-                StrUtil::StatusText(pr.status));
-            SetItemText(i, COL_LATENCY,
-                (pr.status == ConnectStatus::OK)
-                    ? std::to_wstring(pr.latencyMs).c_str()
-                    : L"—");
-            SetItemText(i, COL_TX,
-                pr.bytesSent > 0 ? std::to_wstring(pr.bytesSent).c_str() : L"—");
-            SetItemText(i, COL_RX,
-                pr.bytesRecv > 0 ? std::to_wstring(pr.bytesRecv).c_str() : L"—");
-            RedrawItems(i, i);
-            break;
-        }
-    }
+    // Búsqueda O(log N) por mapa (di,pi) → flatIdx; reemplaza el barrido
+    // lineal anterior, que era O(N) por cada paquete recibido — costoso
+    // con cientos de filas y ráfagas de actualizaciones.
+    auto it = m_indexByDP.find({destIdx, portIdx});
+    if (it == m_indexByDP.end()) return;
+    int i = it->second;
+    if (i < 0 || i >= static_cast<int>(m_rowMap.size())) return;
+
+    // Actualizar el status almacenado para que custom-draw lo lea sin
+    // tener que comparar el texto traducido del control.
+    m_rowMap[i].status = pr.status;
+
+    SetItemText(i, COL_STATUS,
+        StrUtil::StatusText(pr.status));
+    SetItemText(i, COL_LATENCY,
+        (pr.status == ConnectStatus::OK)
+            ? std::to_wstring(pr.latencyMs).c_str()
+            : L"—");
+    SetItemText(i, COL_TX,
+        pr.bytesSent > 0 ? std::to_wstring(pr.bytesSent).c_str() : L"—");
+    SetItemText(i, COL_RX,
+        pr.bytesRecv > 0 ? std::to_wstring(pr.bytesRecv).c_str() : L"—");
+    RedrawItems(i, i);
 }
 
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -146,18 +161,16 @@ void CResultListCtrl::UpdateResult(int destIdx, int portIdx, const PortResult& p
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 void CResultListCtrl::SyncCheckState(int destIdx, int portIdx, bool enabled)
 {
-    for (int i = 0; i < static_cast<int>(m_rowMap.size()); ++i)
-    {
-        if (m_rowMap[i].destIdx == destIdx && m_rowMap[i].portIdx == portIdx)
-        {
-            LVITEM li {}; li.mask = LVIF_PARAM; li.iItem = i;
-            GetItem(&li);
-            li.lParam = EncodeLParam(LParamIdx(li.lParam), enabled);
-            SetItem(&li);
-            RedrawItems(i, i);
-            break;
-        }
-    }
+    auto it = m_indexByDP.find({destIdx, portIdx});
+    if (it == m_indexByDP.end()) return;
+    int i = it->second;
+    if (i < 0 || i >= static_cast<int>(m_rowMap.size())) return;
+
+    LVITEM li {}; li.mask = LVIF_PARAM; li.iItem = i;
+    GetItem(&li);
+    li.lParam = EncodeLParam(LParamIdx(li.lParam), enabled);
+    SetItem(&li);
+    RedrawItems(i, i);
 }
 
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -206,13 +219,12 @@ void CResultListCtrl::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 
         if (sub == COL_STATUS)
         {
-            CString txt = GetItemText(item, COL_STATUS);
+            // Leer el status real almacenado en m_rowMap, no comparar el
+            // texto del control: éste depende del idioma (StatusText) y
+            // se rompería si se traduce a otro locale.
             ConnectStatus cs = ConnectStatus::PENDING;
-            if      (txt == L"OK")            cs = ConnectStatus::OK;
-            else if (txt == L"CERRADO")       cs = ConnectStatus::FAILED;
-            else if (txt == L"SIN RESPUESTA") cs = ConnectStatus::NO_RESPONSE;
-            else if (txt == L"DESCONOCIDO")   cs = ConnectStatus::UNKNOWN;
-            else if (txt == L"\u2014")         cs = ConnectStatus::DISABLED;
+            if (item >= 0 && item < static_cast<int>(m_rowMap.size()))
+                cs = m_rowMap[item].status;
             pCD->clrText = StatusColor(cs);
             *pResult = CDRF_NEWFONT;
             return;
@@ -263,8 +275,10 @@ void CResultListCtrl::OnNMClick(NMHDR* pNMHDR, LRESULT* pResult)
     SetItem(&li);
     RedrawItems(item, item);
 
-    auto [di, pi] = m_rowMap[item];
-    if (m_toggleCb) m_toggleCb(di, pi, newEnabled);
+    // Acceso por nombre — RowTag tiene 3 campos (destIdx, portIdx, status)
+    // tras el refactor; la destructuración de 2 elementos ya no encaja.
+    const auto& tag = m_rowMap[item];
+    if (m_toggleCb) m_toggleCb(tag.destIdx, tag.portIdx, newEnabled);
 }
 
 // ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -394,12 +408,12 @@ void CResultListCtrl::AutoFitColumns()
         }
 
         // c) Pick the larger, enforce per-column minimums
-        int wFinal = max(wContent, wHeader);
+        int wFinal = (std::max)(wContent, wHeader);
 
         if (c == COL_CHECK)
-            wFinal = max(wFinal, 32);   // checkbox needs room
+            wFinal = (std::max)(wFinal, 32);   // checkbox needs room
         else
-            wFinal = max(wFinal, 40);   // general minimum
+            wFinal = (std::max)(wFinal, 40);   // general minimum
 
         SetColumnWidth(c, wFinal);
     }

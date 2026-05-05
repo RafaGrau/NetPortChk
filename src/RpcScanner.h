@@ -32,10 +32,12 @@ struct RpcScanResult
 class RpcScanner
 {
 public:
-    // portResult(port, status, latencyMs) — called once per open port
-    // progress(scanned, total)            — called after every probe
-    // complete()                          — all ports done
-    using PortResultCb = std::function<void(int port, ConnectStatus status, DWORD latMs)>;
+    enum class ScanProto { TCP, UDP, Both };
+
+    // portResult(port, status, latencyMs, proto) — called once per open port
+    // progress(scanned, total)                   — called after every probe
+    // complete()                                 — all ports done
+    using PortResultCb = std::function<void(int port, ConnectStatus status, DWORD latMs, ScanProto proto)>;
     using ProgressCb   = std::function<void(int scanned, int total)>;
     using CompleteCb   = std::function<void()>;
 
@@ -44,6 +46,8 @@ public:
 
     void SetTimeout    (int ms)          { m_timeoutMs   = ms;          }
     void SetConcurrency(int n)           { m_concurrency = max(1, min(n, 500)); }
+    void SetBindIP     (const std::string& ip) { m_bindIP = ip;         }
+    void SetProto      (ScanProto p)     { m_proto = p;                 }
     int  GetTimeout()     const          { return m_timeoutMs;           }
     int  GetConcurrency() const          { return m_concurrency;         }
 
@@ -63,6 +67,7 @@ public:
 
 private:
     std::vector<std::thread> m_workers;
+    std::thread        m_coordThread;
     std::atomic<bool>  m_running  { false };
     std::atomic<bool>  m_stopReq  { false };
     std::atomic<int>   m_total    { 0 };
@@ -70,6 +75,8 @@ private:
 
     int  m_timeoutMs   { 500 };
     int  m_concurrency { 200 };
+    std::string m_bindIP;
+    ScanProto   m_proto { ScanProto::TCP };
 
     // Work queue
     std::queue<int>        m_queue;
@@ -78,7 +85,11 @@ private:
     bool                   m_queueDone { false };
 
     static ConnectStatus ProbeTCP(const std::string& ipA, int port,
-                                  DWORD& latMs, int timeoutMs);
+                                  DWORD& latMs, int timeoutMs,
+                                  const std::string& bindIP = {});
+    static ConnectStatus ProbeUDP(const std::string& ipA, int port,
+                                  DWORD& latMs, int timeoutMs,
+                                  const std::string& bindIP = {});
 
     void WorkerThread(const std::string& ipA,
                       PortResultCb onPortResult,

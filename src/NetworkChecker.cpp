@@ -11,16 +11,38 @@
 // TCP connect with 3-second timeout (non-blocking socket + select)
 // ──────────────────────────────────────────────────────────────────────────────
 ConnectStatus NetworkChecker::CheckTCP(const std::wstring& ip, int port, DWORD& latMs,
-                                       DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs)
+                                       DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs,
+                                       const std::string& bindIP, bool bannerProbe)
 {
     latMs = 0; bytesSent = 0; bytesRecv = 0;
 
-    // Convert wide IP to narrow
-    char ipA[64] = {};
-    WideCharToMultiByte(CP_ACP, 0, ip.c_str(), -1, ipA, sizeof(ipA), nullptr, nullptr);
+    // Convert wide IP to narrow (UTF-8; las IPs son ASCII puro pero UTF-8
+    // es el único codepage de salida correcto independiente del locale).
+    char ipA[INET_ADDRSTRLEN] = {};
+    if (WideCharToMultiByte(CP_UTF8, 0, ip.c_str(), -1,
+                             ipA, sizeof(ipA), nullptr, nullptr) == 0)
+        return ConnectStatus::UNKNOWN;
 
     SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (s == INVALID_SOCKET) return ConnectStatus::UNKNOWN;
+
+    // Bind to specific local NIC if requested
+    if (!bindIP.empty())
+    {
+        sockaddr_in local{};
+        local.sin_family = AF_INET;
+        local.sin_port   = 0;   // let OS assign ephemeral port
+        if (inet_pton(AF_INET, bindIP.c_str(), &local.sin_addr) != 1)
+        {
+            closesocket(s);
+            return ConnectStatus::UNKNOWN;
+        }
+        if (bind(s, reinterpret_cast<sockaddr*>(&local), sizeof(local)) == SOCKET_ERROR)
+        {
+            closesocket(s);
+            return ConnectStatus::UNKNOWN;
+        }
+    }
 
     // Non-blocking
     u_long mode = 1;
@@ -29,7 +51,14 @@ ConnectStatus NetworkChecker::CheckTCP(const std::wstring& ip, int port, DWORD& 
     sockaddr_in addr {};
     addr.sin_family = AF_INET;
     addr.sin_port   = htons(static_cast<u_short>(port));
-    inet_pton(AF_INET, ipA, &addr.sin_addr);
+    if (inet_pton(AF_INET, ipA, &addr.sin_addr) != 1)
+    {
+        // IP de destino corrupta o no IPv4 — abortar antes de connect().
+        // Sin esto, sin_addr quedaría en 0.0.0.0 y connect() haría algo
+        // inesperado (Windows interpreta 0.0.0.0 como loopback).
+        closesocket(s);
+        return ConnectStatus::UNKNOWN;
+    }
 
     auto t0 = std::chrono::steady_clock::now();
     connect(s, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
@@ -38,7 +67,9 @@ ConnectStatus NetworkChecker::CheckTCP(const std::wstring& ip, int port, DWORD& 
     FD_ZERO(&wfds); FD_SET(s, &wfds);
     FD_ZERO(&efds); FD_SET(s, &efds);
 
-    timeval tv { timeoutMs / 1000, (timeoutMs % 1000) * 1000 };
+    // Clamp: select() con timeout negativo es UB.
+    int tMs = (timeoutMs <= 0) ? 1000 : timeoutMs;
+    timeval tv { tMs / 1000, (tMs % 1000) * 1000 };
     int sel = select(0, nullptr, &wfds, &efds, &tv);
 
     ConnectStatus result = ConnectStatus::FAILED;
@@ -54,26 +85,25 @@ ConnectStatus NetworkChecker::CheckTCP(const std::wstring& ip, int port, DWORD& 
                 std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count());
             result = ConnectStatus::OK;
 
-            // TCP handshake itself exchanges ~60-80 bytes (SYN+ACK).
-            // Count those as sent regardless of the probe result.
-            bytesSent = 60;
-
-            // Send a minimal probe and wait up to 500ms for a response.
-            // Many services (LDAP, SMB, RDP…) send a banner or greeting
-            // on connect; others are silent until the client speaks.
-            const char probe[] = "\x00"; // 1 null byte — harmless to any protocol
-            int sent = ::send(s, probe, 1, 0);
-            if (sent > 0) bytesSent += static_cast<DWORD>(sent);
-
-            // Wait briefly for any response
-            fd_set rfds2;
-            FD_ZERO(&rfds2); FD_SET(s, &rfds2);
-            timeval tvRecv { 0, 500000 }; // 500 ms
-            if (select(0, &rfds2, nullptr, nullptr, &tvRecv) > 0)
+            // Sólo enviamos sondeo si el usuario lo ha pedido explícitamente.
+            // Enviar bytes a un servicio en producción puede ser registrado
+            // como tráfico anómalo por SIEM/IDS.
+            if (bannerProbe)
             {
-                char buf[512] = {};
-                int r = ::recv(s, buf, sizeof(buf) - 1, 0);
-                if (r > 0) bytesRecv = static_cast<DWORD>(r);
+                const char probe[] = "\x00"; // 1 null byte — sondeo mínimo
+                int sent = ::send(s, probe, 1, 0);
+                if (sent > 0) bytesSent = static_cast<DWORD>(sent);
+
+                // Wait briefly for any response
+                fd_set rfds2;
+                FD_ZERO(&rfds2); FD_SET(s, &rfds2);
+                timeval tvRecv { 0, 500000 }; // 500 ms
+                if (select(0, &rfds2, nullptr, nullptr, &tvRecv) > 0)
+                {
+                    char buf[512] = {};
+                    int r = ::recv(s, buf, sizeof(buf) - 1, 0);
+                    if (r > 0) bytesRecv = static_cast<DWORD>(r);
+                }
             }
         }
     }
@@ -93,15 +123,36 @@ ConnectStatus NetworkChecker::CheckTCP(const std::wstring& ip, int port, DWORD& 
 // recv data                             → OK.
 // ──────────────────────────────────────────────────────────────────────────────
 ConnectStatus NetworkChecker::CheckUDP(const std::wstring& ip, int port, DWORD& latMs,
-                                       DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs)
+                                       DWORD& bytesSent, DWORD& bytesRecv, int timeoutMs,
+                                       const std::string& bindIP)
 {
     latMs = 0; bytesSent = 0; bytesRecv = 0;
 
-    char ipA[64] = {};
-    WideCharToMultiByte(CP_ACP, 0, ip.c_str(), -1, ipA, sizeof(ipA), nullptr, nullptr);
+    char ipA[INET_ADDRSTRLEN] = {};
+    if (WideCharToMultiByte(CP_UTF8, 0, ip.c_str(), -1,
+                             ipA, sizeof(ipA), nullptr, nullptr) == 0)
+        return ConnectStatus::UNKNOWN;
 
     SOCKET s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (s == INVALID_SOCKET) return ConnectStatus::UNKNOWN;
+
+    // Bind to specific local NIC if requested
+    if (!bindIP.empty())
+    {
+        sockaddr_in local{};
+        local.sin_family = AF_INET;
+        local.sin_port   = 0;
+        if (inet_pton(AF_INET, bindIP.c_str(), &local.sin_addr) != 1)
+        {
+            closesocket(s);
+            return ConnectStatus::UNKNOWN;
+        }
+        if (bind(s, reinterpret_cast<sockaddr*>(&local), sizeof(local)) == SOCKET_ERROR)
+        {
+            closesocket(s);
+            return ConnectStatus::UNKNOWN;
+        }
+    }
 
     // Enable ICMP port-unreachable → WSAECONNRESET (disabled by default on Windows)
     BOOL bConnReset = TRUE;
@@ -112,7 +163,11 @@ ConnectStatus NetworkChecker::CheckUDP(const std::wstring& ip, int port, DWORD& 
     sockaddr_in addr {};
     addr.sin_family = AF_INET;
     addr.sin_port   = htons(static_cast<u_short>(port));
-    inet_pton(AF_INET, ipA, &addr.sin_addr);
+    if (inet_pton(AF_INET, ipA, &addr.sin_addr) != 1)
+    {
+        closesocket(s);
+        return ConnectStatus::UNKNOWN;
+    }
 
     // "Connect" sets default peer – allows recv to get ICMP errors
     connect(s, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
@@ -124,7 +179,9 @@ ConnectStatus NetworkChecker::CheckUDP(const std::wstring& ip, int port, DWORD& 
 
     fd_set rfds;
     FD_ZERO(&rfds); FD_SET(s, &rfds);
-    timeval tv { timeoutMs / 1000, (timeoutMs % 1000) * 1000 };
+    // Clamp: select() con timeout negativo es UB.
+    int tMs = (timeoutMs <= 0) ? 1000 : timeoutMs;
+    timeval tv { tMs / 1000, (tMs % 1000) * 1000 };
     int sel = select(0, &rfds, nullptr, nullptr, &tv);
 
     ConnectStatus result = ConnectStatus::NO_RESPONSE; // UDP timeout: no reply (open or filtered)
@@ -159,8 +216,21 @@ ConnectStatus NetworkChecker::CheckUDP(const std::wstring& ip, int port, DWORD& 
 void NetworkChecker::WorkerProc(std::vector<DestinationResult>* results,
                                 ResultCb onResult, CompleteCb onComplete)
 {
-    // Per-server: TCP ports first, then UDP ports for each destination.
-    // This gives results server-by-server rather than protocol-by-protocol.
+    // Convertir m_bindIP a narrow una sola vez antes de los loops (UTF-8).
+    std::string bindA;
+    if (!m_bindIP.empty())
+    {
+        int n = WideCharToMultiByte(CP_UTF8, 0, m_bindIP.c_str(), -1,
+                                    nullptr, 0, nullptr, nullptr);
+        if (n > 1)
+        {
+            bindA.resize(n - 1);   // sin el terminador NUL
+            WideCharToMultiByte(CP_UTF8, 0, m_bindIP.c_str(), -1,
+                                bindA.data(), n, nullptr, nullptr);
+        }
+    }
+
+    // Por servidor: primero TCP, luego UDP
     for (int di = 0; di < static_cast<int>(results->size()) && !m_stopReq; ++di)
     {
         auto& dr = (*results)[di];
@@ -177,8 +247,8 @@ void NetworkChecker::WorkerProc(std::vector<DestinationResult>* results,
                     pr.status = ConnectStatus::DISABLED;
                 else
                     pr.status = (passProto == Protocol::TCP)
-                        ? CheckTCP(dr.config.ip, pr.entry.port, pr.latencyMs, pr.bytesSent, pr.bytesRecv, m_timeoutMs)
-                        : CheckUDP(dr.config.ip, pr.entry.port, pr.latencyMs, pr.bytesSent, pr.bytesRecv, m_timeoutMs);
+                        ? CheckTCP(dr.config.ip, pr.entry.port, pr.latencyMs, pr.bytesSent, pr.bytesRecv, m_timeoutMs, bindA, m_bannerProbe)
+                        : CheckUDP(dr.config.ip, pr.entry.port, pr.latencyMs, pr.bytesSent, pr.bytesRecv, m_timeoutMs, bindA);
 
                 if (onResult) onResult(di, pi);
             }
@@ -234,9 +304,10 @@ std::wstring NetworkChecker::GetLocalIP()
     }
     freeaddrinfo(res);
 
-    int needed = MultiByteToWideChar(CP_ACP, 0, buf, -1, nullptr, 0);
+    int needed = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
+    if (needed <= 0) return L"127.0.0.1";
     std::wstring result(needed, 0);
-    MultiByteToWideChar(CP_ACP, 0, buf, -1, result.data(), needed);
+    MultiByteToWideChar(CP_UTF8, 0, buf, -1, result.data(), needed);
     if (!result.empty() && result.back() == 0) result.pop_back();
     return result;
 }

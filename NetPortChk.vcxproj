@@ -149,6 +149,8 @@
     <ClCompile Include="src\PortDB.cpp" />
     <ClCompile Include="src\RpcScanner.cpp" />
     <ClCompile Include="src\RpcScanDlg.cpp" />
+    <ClCompile Include="src\UdpListener.cpp" />
+    <ClCompile Include="src\NicSelectDlg.cpp" />
   </ItemGroup>
   <!-- ── Header files ──────────────────────────────────────────────────────── -->
   <ItemGroup>
@@ -167,6 +169,8 @@
     <ClInclude Include="src\HtmlExporter.h" />
     <ClInclude Include="src\RpcScanner.h" />
     <ClInclude Include="src\RpcScanDlg.h" />
+    <ClInclude Include="src\UdpListener.h" />
+    <ClInclude Include="src\NicSelectDlg.h" />
   </ItemGroup>
   <!-- ── Resource files ────────────────────────────────────────────────────── -->
   <ItemGroup>
@@ -191,16 +195,19 @@
     <Image Include="res\help.ico" />
     <Image Include="res\html.ico" />
     <Image Include="res\info.ico" />
+    <Image Include="res\network_card.ico" />
     <Image Include="res\play.ico" />
     <Image Include="res\port_add.ico" />
     <Image Include="res\port_del.ico" />
     <Image Include="res\port_edit.ico" />
     <Image Include="res\save.ico" />
+    <Image Include="res\server.ico" />
     <Image Include="res\srv_add.ico" />
     <Image Include="res\srv_del.ico" />
     <Image Include="res\stop.ico" />
     <Image Include="res\view_list.ico" />
     <Image Include="res\view_tabs.ico" />
+    <Image Include="res\win_client.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

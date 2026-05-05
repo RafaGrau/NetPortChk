@@ -1,18 +1,12 @@
 // Microsoft Visual C++ generated resource script.
-//
 #pragma code_page(1252)
 #include "resource.h"
-
-#define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "winres.h"
 #include "version.h"
-
-/////////////////////////////////////////////////////////////////////////////
-#undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
 // Espaóol (Espaóa) resources
@@ -55,6 +49,11 @@ IDI_ICON_PORT_ADD  ICON  "..\\res\\port_add.ico"
 IDI_ICON_SRV_DEL   ICON  "..\\res\\srv_del.ico"
 IDI_ICON_RPC_SCAN  ICON  "..\\res\\coms_range.ico"
 IDI_ICON_APP64     ICON  "..\\res\\appMain64.ico"
+IDI_ICON_SERVER    ICON  "..\\res\\server.ico"
+IDI_ICON_CLIENT    ICON  "..\\res\\win_client.ico"
+IDI_ICON_NETCARD   ICON  "..\\res\\network_card.ico"
+IDI_ICON_COMS_TX_RX ICON "..\\res\\coms_tx-rx.ico"
+IDI_ICON_COMS_TX   ICON  "..\\res\\coms_tx.ico"
 
 // cp1252: 0xE1=a 0xE9=e 0xED=i 0xF3=o 0xFA=u 0xF1=n~ 0xBF=?inv
 
@@ -219,12 +218,14 @@ BEGIN
     EDITTEXT        IDC_RPC_PORT_FROM,171,6,41,12,ES_NUMBER
     LTEXT           "-",IDC_STATIC,217,8,8,8
     EDITTEXT        IDC_RPC_PORT_TO,223,6,42,12,ES_NUMBER
-    CONTROL         "",IDC_RPC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,1,23,291,196
+    CONTROL         "",IDC_RPC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,23,292,196
     LTEXT           "Hilos:",IDC_STATIC,7,226,24,8
     EDITTEXT        IDC_RPC_THREADS,33,224,34,12,ES_NUMBER
     LTEXT           "Timeout:",IDC_STATIC,74,226,32,8
     COMBOBOX        IDC_RPC_TIMEOUT,108,224,66,50,CBS_DROPDOWNLIST | WS_TABSTOP
-    DEFPUSHBUTTON   "Escanear",IDC_RPC_BTN_SCAN,212,222,73,16
+    LTEXT           "Protocolo:",IDC_STATIC,180,226,39,8
+    COMBOBOX        IDC_RPC_PROTO,225,224,60,40,CBS_DROPDOWNLIST | WS_TABSTOP
+    DEFPUSHBUTTON   "Escanear",IDC_RPC_BTN_SCAN,152,278,64,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,244,292,1
     CONTROL         "",IDC_RPC_PROGRESS,"msctls_progress32",WS_BORDER,3,250,285,10
     LTEXT           "Listo",IDC_RPC_STATUS,3,264,285,10
@@ -235,6 +236,20 @@ END
 /////////////////////////////////////////////////////////////////////////////
 
 
+/////////////////////////////////////////////////////////////////////////////
+// IDD_NIC_SELECT -- Selección de tarjeta de red
+IDD_NIC_SELECT DIALOGEX 0, 0, 310, 200
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tarjeta de red activa"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    LTEXT           "Seleccione el adaptador que usará para las pruebas de conectividad:",IDC_STATIC,7,7,296,10
+    CONTROL         "",IDC_NIC_LIST,"SysListView32",LVS_REPORT|LVS_SINGLESEL|LVS_SHOWSELALWAYS|WS_BORDER|WS_TABSTOP,7,21,296,140
+    DEFPUSHBUTTON   "Aceptar",IDOK,190,170,55,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,250,170,55,14
+END
+
+#define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 // TEXTINCLUDE
 

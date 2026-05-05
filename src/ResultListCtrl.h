@@ -1,6 +1,8 @@
 #pragma once
 #include "AppTypes.h"
 #include <vector>
+#include <map>
+#include <utility>
 #include <functional>
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -55,6 +57,13 @@ public:
     // Auto-fit all columns: centre headers, width = max(header, content)
     void AutoFitColumns();
 
+    // Returns the destination index for a given list item (-1 if invalid)
+    int GetItemDestIdx(int item) const
+    {
+        if (item < 0 || item >= static_cast<int>(m_rowMap.size())) return -1;
+        return m_rowMap[item].destIdx;
+    }
+
     // Callbacks
     void SetCheckToggleCb(CheckToggleCb cb) { m_toggleCb  = cb; }
     void SetBatchToggleCb(BatchToggleCb cb) { m_batchCb   = cb; }
@@ -68,26 +77,41 @@ protected:
 
 private:
     // ── Row map ──────────────────────────────────────────────────────────────
-    struct RowTag { int destIdx; int portIdx; };
-    std::vector<RowTag> m_rowMap;          // flat item index → (destIdx, portIdx)
+    // Status guardado aquí evita comparar texto traducido en custom-draw,
+    // que rompería al traducir StatusText (StrUtil) a otro idioma.
+    struct RowTag { int destIdx; int portIdx; ConnectStatus status { ConnectStatus::PENDING }; };
+    std::vector<RowTag> m_rowMap;          // flat item index → (destIdx, portIdx, status)
+
+    // Acelerador O(1) para UpdateResult/SyncCheckState — antes O(n) por
+    // recorrido lineal de m_rowMap por cada paquete recibido.
+    std::map<std::pair<int,int>, int> m_indexByDP;
+
+    // Estado: si ya se ha hecho el autosize de columnas. AutoFitColumns es
+    // costoso (LVSCW_AUTOSIZE recorre todas las celdas) y no merece la pena
+    // reaplicarlo cada vez que se repuebla la lista durante un escaneo.
+    bool m_columnsFitted { false };
 
     // ── Callbacks ────────────────────────────────────────────────────────────
     CheckToggleCb m_toggleCb;
     BatchToggleCb m_batchCb;
-
-    // ── Context menu helpers ─────────────────────────────────────────────────
 
     // ── Drawing ──────────────────────────────────────────────────────────────
     void     DrawCheckCell(CDC* dc, const CRect& cellRect, bool checked, bool disabled);
     COLORREF StatusColor(ConnectStatus s);
 
     // ── lParam encoding ──────────────────────────────────────────────────────
-    // Bit 31 = enabled flag (1 = enabled / checked)
+    // Bit 31    = enabled flag (1 = enabled / checked)
     // Bits 0-30 = flat item index (row identity)
+    //
+    // Usar constexpr LPARAM evita el sign-extend a 64 bits que ocurre al
+    // mezclar el literal `long` 0x80000000L con LPARAM (es int64 en x64).
+    static constexpr LPARAM kEnabledBit = static_cast<LPARAM>(1) << 31;
+    static constexpr LPARAM kIdxMask    = kEnabledBit - 1;
+
     static LPARAM EncodeLParam(int flatIdx, bool enabled)
     {
-        return static_cast<LPARAM>(flatIdx) | (enabled ? 0x80000000L : 0L);
+        return (static_cast<LPARAM>(flatIdx) & kIdxMask) | (enabled ? kEnabledBit : 0);
     }
-    static bool   LParamEnabled(LPARAM lp) { return (lp & 0x80000000L) != 0; }
-    static int    LParamIdx    (LPARAM lp) { return static_cast<int>(lp & 0x7FFFFFFFL); }
+    static bool   LParamEnabled(LPARAM lp) { return (lp & kEnabledBit) != 0; }
+    static int    LParamIdx    (LPARAM lp) { return static_cast<int>(lp & kIdxMask); }
 };

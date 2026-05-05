@@ -67,3 +67,12 @@ void CAboutDlg::OnLinkIcons8(NMHDR* pNMHDR, LRESULT* pResult)
     ShellExecuteW(nullptr, L"open", pLink->item.szUrl, nullptr, nullptr, SW_SHOWNORMAL);
     *pResult = 0;
 }
+
+// Liberar el HICON sólo después de que el HWND (y su control STATIC) hayan
+// sido completamente destruidos. Hacerlo antes podía dejar al control
+// pintando con un handle inválido durante WM_NCDESTROY.
+void CAboutDlg::PostNcDestroy()
+{
+    if (m_hIcon64) { DestroyIcon(m_hIcon64); m_hIcon64 = nullptr; }
+    CDialogEx::PostNcDestroy();
+}

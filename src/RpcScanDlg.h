@@ -13,6 +13,7 @@ class CRpcScanDlg : public CDialogEx
     DECLARE_DYNAMIC(CRpcScanDlg)
 public:
     explicit CRpcScanDlg(const std::wstring& defaultIP = L"",
+                          const std::wstring& bindIP    = L"",
                           CWnd* pParent = nullptr);
     enum { IDD = IDD_RPC_SCAN };
 
@@ -38,6 +39,7 @@ private:
     CEdit        m_edTo;
     CEdit        m_edThreads;
     CComboBox    m_cbTimeout;
+    CComboBox    m_cbProto;
     CListCtrl    m_list;
     CButton      m_btnScan;
     CButton      m_btnExport;
@@ -47,21 +49,24 @@ private:
     // Scanner
     RpcScanner   m_scanner;
 
-    // Results cache (sorted by port)
-    struct ScanRow { int port; DWORD latMs; };
-    std::vector<ScanRow> m_rows;
-    std::mutex           m_rowsMtx;
+    // Estructura para pasar el resultado completo vía PostMessage.
+    // Reemplaza el bit-packing en LPARAM, que desbordaba para latencias
+    // > 65535 ms en builds x86 (LPARAM = 32 bits → latMs<<16 perdía bits).
+    struct ScanResultPacket {
+        int           port;
+        ConnectStatus status;
+        DWORD         latMs;
+        RpcScanner::ScanProto proto;
+    };
 
     std::wstring m_defaultIP;
+    std::wstring m_bindIP;
     int          m_total { 0 };
 
     void SetScanningState(bool scanning);
-    void AddRow(int port, DWORD latMs);
+    void AddRow(int port, DWORD latMs, bool isUdp = false);
     void UpdateStatus(int scanned, int total);
     void ExportToCsv();
 };
 
-// Custom window messages (posted from scanner callbacks)
-#define WM_RPC_RESULT   (WM_USER + 200)   // wParam=port, lParam=latMs<<32|status
-#define WM_RPC_PROGRESS (WM_USER + 201)   // wParam=scanned, lParam=total
-#define WM_RPC_COMPLETE (WM_USER + 202)
+// Mensajes WM_RPC_* declarados en AppTypes.h (rango WM_USER+200..299).

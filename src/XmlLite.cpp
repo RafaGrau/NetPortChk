@@ -3,6 +3,9 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <climits>
+#include <codecvt>
+#include <locale>
 
 // ──────────────────────────────────────────────────────────────────────────────
 // XmlNode helpers
@@ -17,7 +20,15 @@ int XmlNode::AttrInt(const wchar_t* name, int def) const
 {
     auto it = attrs.find(name);
     if (it == attrs.end() || it->second.empty()) return def;
-    return std::stoi(it->second);
+    try {
+        size_t idx = 0;
+        long v = std::stol(it->second, &idx);
+        if (idx == 0)                          return def;
+        if (v < INT_MIN || v > INT_MAX)        return def;
+        return static_cast<int>(v);
+    } catch (...) {
+        return def;   // invalid_argument, out_of_range, etc.
+    }
 }
 
 bool XmlNode::AttrBool(const wchar_t* name, bool def) const
@@ -51,6 +62,8 @@ struct Parser
 {
     const wchar_t* p;
     const wchar_t* end;
+    int   depth { 0 };
+    static constexpr int kMaxDepth = 64;   // protección anti-overflow de pila
 
     wchar_t peek() const { return (p < end) ? *p : 0; }
     wchar_t get()        { return (p < end) ? *p++ : 0; }
@@ -98,6 +111,11 @@ struct Parser
     // Returns nullptr on error / end of input
     std::shared_ptr<XmlNode> ParseNode()
     {
+        // Anti-stack-overflow: rechazar XML profundamente anidado.
+        if (depth >= kMaxDepth) return nullptr;
+        ++depth;
+        struct DepthGuard { int& d; ~DepthGuard() { --d; } } guard{ depth };
+
         SkipWS();
         if (eof() || peek() != L'<') return nullptr;
         get(); // '<'
@@ -178,8 +196,27 @@ std::shared_ptr<XmlNode> XmlParse(const std::wstring& xml)
 
 std::shared_ptr<XmlNode> XmlParseFile(const wchar_t* path)
 {
-    std::wifstream f(path);
+    std::wifstream f(path, std::ios::binary);
     if (!f.is_open()) return nullptr;
+
+    // Anti-DoS: rechazar ficheros excesivamente grandes (4 MiB es de sobra
+    // para una configuración real de NetPortChk con cientos de servidores).
+    f.seekg(0, std::ios::end);
+    auto sz = f.tellg();
+    f.seekg(0, std::ios::beg);
+    if (sz < 0 || sz > static_cast<std::streamoff>(4 * 1024 * 1024))
+        return nullptr;
+
+    // Imbuir UTF-8: el writer declara `encoding="UTF-8"` y emite UTF-8;
+    // sin imbue, wifstream usa la cp del sistema y los acentos se corrompen
+    // al mover el config entre máquinas con locales distintos.
+    // consume_header descarta un BOM EF BB BF si está presente.
+#pragma warning(push)
+#pragma warning(disable: 4996)
+    f.imbue(std::locale(f.getloc(),
+        new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
+#pragma warning(pop)
+
     std::wstring xml((std::istreambuf_iterator<wchar_t>(f)),
                       std::istreambuf_iterator<wchar_t>());
     return XmlParse(xml);
@@ -245,8 +282,16 @@ std::wstring XmlWriter::ToString() const { return m_ss.str(); }
 
 bool XmlWriter::WriteFile(const wchar_t* path) const
 {
-    std::wofstream f(path);
+    std::wofstream f(path, std::ios::binary);
     if (!f.is_open()) return false;
+
+    // Coherente con la cabecera "<?xml encoding=UTF-8?>": forzar UTF-8 al
+    // escribir, sin depender de la cp del sistema.
+#pragma warning(push)
+#pragma warning(disable: 4996)
+    f.imbue(std::locale(f.getloc(), new std::codecvt_utf8<wchar_t>));
+#pragma warning(pop)
+
     f << m_ss.str();
     return f.good();
 }

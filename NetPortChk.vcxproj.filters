@@ -64,6 +64,8 @@
     <ClCompile Include="src\ConfigEditorDlg.cpp" />
     <ClCompile Include="src\RpcScanner.cpp" />
     <ClCompile Include="src\RpcScanDlg.cpp" />
+    <ClCompile Include="src\UdpListener.cpp" />
+    <ClCompile Include="src\NicSelectDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- PCH header -->
@@ -106,6 +108,8 @@
     <ClInclude Include="src\ConfigEditorDlg.h" />
     <ClInclude Include="src\RpcScanner.h" />
     <ClInclude Include="src\RpcScanDlg.h" />
+    <ClInclude Include="src\UdpListener.h" />
+    <ClInclude Include="src\NicSelectDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\NetPortChk.rc">
@@ -142,5 +146,8 @@
     <Image Include="res\srv_del.ico" />
     <Image Include="res\coms_range.ico" />
     <Image Include="res\appMain64.ico" />
+    <Image Include="res\server.ico" />
+    <Image Include="res\win_client.ico" />
+    <Image Include="res\network_card.ico" />
   </ItemGroup>
 </Project>

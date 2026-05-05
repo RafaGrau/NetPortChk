@@ -10,9 +10,9 @@
 // ──────────────────────────────────────────────────────────────────────────────
 
 #define VER_MAJOR   1
-#define VER_MINOR   4
+#define VER_MINOR   6
 #define VER_PATCH   0
-#define VER_BUILD   10
+#define VER_BUILD   6
 
 // Helper macros used by the RC file
 #define VER_FILEVERSION      VER_MAJOR,VER_MINOR,VER_PATCH,VER_BUILD

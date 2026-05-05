@@ -38,7 +38,13 @@ bool ConfigManager::Load(const wchar_t* path, AppConfig& out)
 
     // <Settings timeout="..."/>
     if (auto sNode = root->FirstChild(L"Settings"))
-        out.timeoutMs = sNode->AttrInt(L"timeout", 1000);
+    {
+        int t = sNode->AttrInt(L"timeout", 1000);
+        // Rechazar valores fuera de un rango razonable (evita timeouts negativos,
+        // cero o ridículamente largos que congelarían la UI).
+        if (t < 100 || t > 60000) t = 1000;
+        out.timeoutMs = t;
+    }
 
     // <Destinations>
     auto destsNode = root->FirstChild(L"Destinations");
@@ -57,7 +63,10 @@ bool ConfigManager::Load(const wchar_t* path, AppConfig& out)
             for (auto& portNode : portsNode->Children(L"Port"))
             {
                 PortEntry pe;
-                pe.port        = portNode->AttrInt(L"port");
+                int p = portNode->AttrInt(L"port", 0);
+                // Validar rango — descartar entradas corruptas o maliciosas.
+                if (p < 1 || p > 65535) continue;
+                pe.port        = p;
                 pe.protocol    = ParseProto(portNode->Attr(L"protocol"));
                 pe.enabled     = portNode->AttrBool(L"enabled", true);
                 // Description is not persisted; resolve from well-known table
